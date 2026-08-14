@@ -61,16 +61,16 @@
   .field{flex:1;display:flex;flex-direction:column;gap:4px;}
   .field label{font-size:11px;color:#9fb3c8;font-weight:600;}
   .field input{
-    background:rgba(255,255,255,0.08);
-    border:1px solid rgba(255,255,255,0.2);
+    background:var(--paper);
+    border:1px solid var(--line);
     border-radius:8px;
-    color:#fbf9f3;
+    color:var(--ink);
     padding:9px 10px;
     font-size:14.5px;
     font-family:inherit;
     outline:none;
   }
-  .field input::placeholder{color:rgba(251,249,243,0.4);}
+  .field input::placeholder{color:var(--ink-soft);}
   .field input:focus{border-color:var(--green-bright);}
   .field.opponent{flex:1.6;}
 
@@ -339,7 +339,7 @@
     <h1>鳥取城北高校2年生<br>試合結果</h1>
     <div class="match-row">
       <div class="field opponent">
-        <label for="opponent">対戦相手</label>
+        <label for="opponent">対戦相手 <span style="color:#e08a6b;">必須</span></label>
         <input id="opponent" type="text" placeholder="例）鳥取商業高校">
       </div>
       <div class="field" style="max-width:130px;">
@@ -1112,6 +1112,16 @@ function renderGoals(){
   });
 }
 
+function validateOpponent(){
+  const opponent = document.getElementById('opponent').value.trim();
+  if(!opponent){
+    showToast('「対戦相手」は必須です');
+    document.getElementById('opponent').focus();
+    return false;
+  }
+  return true;
+}
+
 function validateComments(){
   const good = comments[currentTeam].good.trim();
   const issue = comments[currentTeam].issue.trim();
@@ -1162,10 +1172,10 @@ function buildMessage(){
   msg += `課題点\n${issue}\n`;
   msg += `━━━━━━━━━━\n`;
   msg += `前半 出場（${firstList.length}名）\n`;
-  msg += firstList.length ? firstList.map(p=>`${String(p.no).padStart(2,' ')} ${p.name}`).join('\n') : '（未選択）';
+  msg += firstList.length ? firstList.map(p=>`${String(p.no).padStart(2,' ')} ${p.name}（${p.pos}）`).join('\n') : '（未選択）';
   msg += `\n━━━━━━━━━━\n`;
   msg += `後半 出場（${secondList.length}名）\n`;
-  msg += secondList.length ? secondList.map(p=>`${String(p.no).padStart(2,' ')} ${p.name}`).join('\n') : '（未選択）';
+  msg += secondList.length ? secondList.map(p=>`${String(p.no).padStart(2,' ')} ${p.name}（${p.pos}）`).join('\n') : '（未選択）';
   return msg;
 }
 
@@ -1267,7 +1277,7 @@ async function openShareSheet(text){
 shareOverlay.addEventListener('click', (e)=>{ if(e.target === shareOverlay) shareOverlay.classList.remove('show'); });
 
 document.getElementById('sendLine').addEventListener('click', async ()=>{
-  if(mode === 'result' && !validateComments()) return;
+  if(mode === 'result' && (!validateOpponent() || !validateComments())) return;
   const text = mode === 'assign' ? buildAssignMessage() : buildMessage();
   const ok = await copyToClipboard(text);
   if(ok){
@@ -1279,7 +1289,7 @@ document.getElementById('sendLine').addEventListener('click', async ()=>{
 });
 
 document.getElementById('copyText').addEventListener('click', ()=>{
-  if(mode === 'result' && !validateComments()) return;
+  if(mode === 'result' && (!validateOpponent() || !validateComments())) return;
   const text = mode === 'assign' ? buildAssignMessage() : buildMessage();
   openShareSheet(text);
 });
@@ -1431,22 +1441,21 @@ async function loadPersisted(){
   if(raw){
     try{
       const data = JSON.parse(raw);
-      // 対戦相手・試合結果(得点)・得点者/アシストは毎回リセットする仕様のため、
-      // ここでは意図的に復元しない（グループ分け・出場選手・コメントのみ復元）。
+      // 対戦相手・試合結果(得点)・得点者/アシスト・出場選手チェック・コメントは
+      // 毎回リセットする仕様のため、ここでは意図的に復元しない。
+      // グループ分け（A/B振り分け）のみ復元する。
       assignment = data.assignment || {};
-      selected.A.first = new Set((data.A && data.A.first) || []);
-      selected.A.second = new Set((data.A && data.A.second) || []);
-      selected.B.first = new Set((data.B && data.B.first) || []);
-      selected.B.second = new Set((data.B && data.B.second) || []);
-      comments = data.comments || { A:{good:'',issue:''}, B:{good:'',issue:''} };
     }catch(e){ /* corrupt draft, ignore */ }
   }
   // Always start fresh for these, regardless of what was saved previously.
   document.getElementById('opponent').value = '';
   scores = { A:{own:'',opp:''}, B:{own:'',opp:''} };
   goals = { A: [], B: [] };
-  comments.A.good = '';
-  comments.B.good = '';
+  comments = { A:{good:'',issue:''}, B:{good:'',issue:''} };
+  selected = {
+    A: { first: new Set(), second: new Set() },
+    B: { first: new Set(), second: new Set() },
+  };
 
   let regRaw = await storageGet('player-registry-v1');
   if(regRaw){
