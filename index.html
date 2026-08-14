@@ -1257,13 +1257,15 @@ document.getElementById('sendLine').addEventListener('click', ()=>{
   if(mode === 'result' && (!validateOpponent() || !validateComments())) return;
   const text = mode === 'assign' ? buildAssignMessage() : buildMessage();
 
-  // Fire-and-forget copy as a safety net — NOT awaited, because the
-  // navigation below must happen synchronously inside this click handler
-  // for mobile browsers to treat the LINE app hand-off as part of the tap.
+  // Fire-and-forget copy — NOT awaited, so opening LINE below still
+  // happens synchronously within this tap (required for mobile browsers
+  // to allow the app hand-off).
   copyToClipboard(text);
+  showToast('コピーしました。LINEを開いたら貼り付けて送信してください');
 
-  const url = 'https://line.me/R/msg/text/?' + encodeURIComponent(text);
-  window.location.href = url;
+  // Just launch the LINE app itself (no message text in the URL), so
+  // there's nothing that can be "too long" and error out on any device.
+  window.location.href = 'line://';
 });
 
 // ---- detail / edit modal ----
