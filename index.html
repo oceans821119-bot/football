@@ -58,17 +58,29 @@
     letter-spacing:.02em;
   }
   .match-row{display:flex;gap:8px;}
-  .field{flex:1;display:flex;flex-direction:column;gap:4px;}
+  .field{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0;}
   .field label{font-size:11px;color:#9fb3c8;font-weight:600;}
   .field input{
     background:var(--paper);
     border:1px solid var(--line);
     border-radius:8px;
     color:var(--ink);
-    padding:9px 10px;
+    padding:11px 14px;
     font-size:14.5px;
     font-family:inherit;
     outline:none;
+    box-sizing:border-box;
+    width:100%;
+    min-width:0;
+    -webkit-appearance:none;
+    appearance:none;
+  }
+  .field input::-webkit-calendar-picker-indicator{
+    margin:0;
+    padding:0;
+  }
+  .field input::-webkit-date-and-time-value{
+    text-align:left;
   }
   .field input::placeholder{color:var(--ink-soft);}
   .field input:focus{border-color:var(--green-bright);}
@@ -342,7 +354,7 @@
         <label for="opponent">対戦相手 <span style="color:#e08a6b;">必須</span></label>
         <input id="opponent" type="text" placeholder="例）鳥取商業高校">
       </div>
-      <div class="field" style="max-width:130px;">
+      <div class="field" style="max-width:130px; margin-right:18px;">
         <label for="matchDate">日付</label>
         <input id="matchDate" type="date">
       </div>
@@ -437,9 +449,8 @@
   <footer id="footer" style="display:none;">
     <button class="send-btn teamA" id="sendLine">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 5.94 2 10.8c0 3.06 1.94 5.76 4.86 7.32-.18.68-1.15 4.05-1.19 4.31 0 0-.02.19.1.27.12.08.27.02.27.02.35-.05 4.05-2.65 4.7-3.11.85.12 1.73.19 2.26.19 5.52 0 10-3.94 10-8.8S17.52 2 12 2Z" fill="#fff"/></svg>
-      <span id="sendLineLabel">テキストをコピー</span>
+      <span id="sendLineLabel">テキストをコピー＆LINEを開く</span>
     </button>
-    <button class="copy-link" id="copyText">内容を画面に表示して手動でコピー</button>
   </footer>
   <div class="toast" id="toast"></div>
 
@@ -449,10 +460,6 @@
 
   <div class="modal-overlay" id="confirmOverlay">
     <div class="modal-sheet" id="confirmSheet"></div>
-  </div>
-
-  <div class="modal-overlay" id="shareOverlay">
-    <div class="modal-sheet" id="shareSheet"></div>
   </div>
 </div>
 
@@ -922,11 +929,11 @@ function switchMode(m){
   if(!showResult){
     sendBtn.classList.remove('teamA','teamB');
     sendBtn.classList.add('assignMode');
-    document.getElementById('sendLineLabel').textContent = 'テキストをコピー（グループ分け一覧）';
+    document.getElementById('sendLineLabel').textContent = 'テキストをコピー＆LINEを開く（グループ分け一覧）';
   } else {
     sendBtn.classList.remove('assignMode');
     sendBtn.classList.add(currentTeam === 'A' ? 'teamA' : 'teamB');
-    document.getElementById('sendLineLabel').textContent = `テキストをコピー（${teamLabel(currentTeam)}）`;
+    document.getElementById('sendLineLabel').textContent = `テキストをコピー＆LINEを開く（${teamLabel(currentTeam)}）`;
   }
 
   if(showResult) renderGoals();
@@ -942,7 +949,7 @@ function switchTeam(team){
   const btn = document.getElementById('sendLine');
   btn.classList.toggle('teamA', team==='A');
   btn.classList.toggle('teamB', team==='B');
-  document.getElementById('sendLineLabel').textContent = `テキストをコピー（${teamLabel(team)}）`;
+  document.getElementById('sendLineLabel').textContent = `テキストをコピー＆LINEを開く（${teamLabel(team)}）`;
 
   document.getElementById('scoreOwn').value = scores[team].own;
   document.getElementById('scoreOpp').value = scores[team].opp;
@@ -1239,59 +1246,17 @@ async function copyToClipboard(text){
   }
 }
 
-// ---- share sheet (guaranteed-to-work fallback: select & copy by hand) ----
-const shareOverlay = document.getElementById('shareOverlay');
-const shareSheet = document.getElementById('shareSheet');
-
-async function openShareSheet(text){
-  shareSheet.innerHTML = `
-    <div class="modal-head">
-      <div class="modal-title"><div class="m-name">LINEに送る内容</div></div>
-      <button class="modal-close" id="shClose">✕</button>
-    </div>
-    <div class="confirm-msg">「コピーする」を押してからLINEのトークに貼り付けてください。うまく貼り付けられない場合は、下の欄の文字を直接タップして全選択し、手動でコピーしてください。</div>
-    <textarea id="shareTextArea" readonly style="width:100%;min-height:240px;padding:10px;border:1px solid var(--line);border-radius:8px;font-family:inherit;font-size:12.5px;line-height:1.55;background:#fff;box-sizing:border-box;"></textarea>
-    <div class="modal-actions" style="margin-top:12px;">
-      <button class="cancel-btn" id="shCloseBtn">閉じる</button>
-      <button class="save-btn" id="shCopyBtn">コピーする</button>
-    </div>
-  `;
-  const ta = document.getElementById('shareTextArea');
-  ta.value = text; // set via .value, not innerHTML, so special characters can't break the markup
-
-  const close = ()=>shareOverlay.classList.remove('show');
-  document.getElementById('shClose').addEventListener('click', close);
-  document.getElementById('shCloseBtn').addEventListener('click', close);
-  document.getElementById('shCopyBtn').addEventListener('click', async ()=>{
-    ta.focus();
-    ta.select();
-    const ok = await copyToClipboard(text);
-    showToast(ok ? 'コピーしました' : '自動コピーに失敗しました。上の欄を選択してコピーしてください');
-  });
-  shareOverlay.classList.add('show');
-
-  // Try copying immediately too, so it's often already done by the time they read this.
-  const auto = await copyToClipboard(text);
-  if(auto) showToast('コピーしました。LINEに貼り付けてください');
-}
-shareOverlay.addEventListener('click', (e)=>{ if(e.target === shareOverlay) shareOverlay.classList.remove('show'); });
-
-document.getElementById('sendLine').addEventListener('click', async ()=>{
+document.getElementById('sendLine').addEventListener('click', ()=>{
   if(mode === 'result' && (!validateOpponent() || !validateComments())) return;
   const text = mode === 'assign' ? buildAssignMessage() : buildMessage();
-  const ok = await copyToClipboard(text);
-  if(ok){
-    showToast('コピーしました。LINEに貼り付けてください');
-  } else {
-    showToast('自動コピーに失敗しました。内容を表示して手動でコピーしてください');
-    openShareSheet(text);
-  }
-});
 
-document.getElementById('copyText').addEventListener('click', ()=>{
-  if(mode === 'result' && (!validateOpponent() || !validateComments())) return;
-  const text = mode === 'assign' ? buildAssignMessage() : buildMessage();
-  openShareSheet(text);
+  // Fire-and-forget copy as a safety net — NOT awaited, because the
+  // navigation below must happen synchronously inside this click handler
+  // for mobile browsers to treat the LINE app hand-off as part of the tap.
+  copyToClipboard(text);
+
+  const url = 'https://line.me/R/msg/text/?' + encodeURIComponent(text);
+  window.location.href = url;
 });
 
 // ---- detail / edit modal ----
