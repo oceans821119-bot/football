@@ -64,6 +64,22 @@
     margin:0 0 14px;
     letter-spacing:.02em;
   }
+  .team-name-input{
+    font-family:'Shippori Mincho',serif;
+    font-weight:800;
+    font-size:20px;
+    letter-spacing:.02em;
+    color:#f4f0e6;
+    background:none;
+    border:none;
+    border-bottom:1px dashed rgba(244,240,230,0.35);
+    padding:0 0 2px;
+    outline:none;
+    width:100%;
+    max-width:100%;
+  }
+  .team-name-input::placeholder{color:rgba(244,240,230,0.45);}
+  .team-name-input:focus{border-bottom-color:var(--green-bright);}
   .match-row{display:flex;gap:8px;}
   .field{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0;}
   .field label{font-size:11px;color:#9fb3c8;font-weight:600;}
@@ -73,7 +89,7 @@
     border-radius:8px;
     color:var(--ink);
     padding:11px 14px;
-    font-size:14.5px;
+    font-size:16px;
     font-family:inherit;
     outline:none;
     box-sizing:border-box;
@@ -144,12 +160,13 @@
   .comment-block label .req{color:var(--red);font-size:11px;font-weight:800;}
   .comment-block textarea{
     width:100%;min-height:64px;padding:10px 12px;border-radius:9px;
-    border:1px solid var(--line);font-family:inherit;font-size:13.5px;
+    border:1px solid var(--line);font-family:inherit;font-size:16px;
     background:var(--paper-card);resize:vertical;outline:none;line-height:1.5;
   }
   .comment-block textarea:focus{border-color:var(--green);}
   .comment-block.good label{color:var(--green);}
   .comment-block.issue label{color:#9a5a1f;}
+  .comment-block.other label{color:var(--ink-soft);}
 
   .goals-panel{margin:14px 20px 0;}
   .goals-title{
@@ -157,10 +174,13 @@
     margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;
   }
   .add-goal-btn{
-    background:none;border:1.5px solid var(--green);color:var(--green);
-    border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700;
-    font-family:inherit;cursor:pointer;
+    width:100%;
+    background:var(--green);color:#fff;border:none;
+    border-radius:10px;padding:13px 0;font-size:15px;font-weight:700;
+    font-family:inherit;cursor:pointer;margin-bottom:10px;
+    box-shadow:0 4px 10px rgba(47,110,79,0.25);
   }
+  .add-goal-btn:active{background:var(--green-bright);}
   .goal-item{
     display:flex;align-items:center;gap:8px;
     background:var(--paper-card);border:1px solid var(--line);border-radius:9px;
@@ -187,7 +207,7 @@
   .goal-form label, .add-player-form label{font-size:11px;color:var(--ink-soft);font-weight:600;display:block;margin-bottom:3px;}
   .goal-form select, .add-player-form select, .add-player-form input{
     width:100%;padding:8px;border-radius:7px;border:1px solid var(--line);
-    font-family:inherit;font-size:13.5px;background:#fff;
+    font-family:inherit;font-size:16px;background:#fff;
   }
   .goal-form .half-pick{display:flex;gap:6px;}
   .goal-form .half-pick button{
@@ -219,14 +239,46 @@
   .assign-counts{display:flex;gap:10px;font-size:12px;}
   .assign-counts b{color:var(--ink);}
   .add-player-btn{
-    background:var(--navy);color:#fff;border:none;border-radius:8px;
-    padding:6px 12px;font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer;
+    width:100%;
+    background:var(--green);color:#fff;border:none;
+    border-radius:10px;padding:13px 0;font-size:15px;font-weight:700;
+    font-family:inherit;cursor:pointer;
+    box-shadow:0 4px 10px rgba(47,110,79,0.3);
   }
+  .add-player-btn:active{background:var(--green-bright);}
+  .bulk-btn{
+    background:none;color:var(--navy);border:1.5px solid var(--navy);
+    border-radius:10px;padding:11px 0;font-size:13.5px;font-weight:700;
+    font-family:inherit;cursor:pointer;
+  }
+  .bulk-btn:active{background:rgba(19,32,56,0.06);}
+  .bulk-form{
+    background:var(--paper-card);border:1px solid var(--line);border-radius:10px;
+    padding:12px;margin:10px 0;display:flex;flex-direction:column;gap:8px;
+  }
+  .bulk-form label{font-size:11px;color:var(--ink-soft);font-weight:600;}
+  .bulk-form .bulk-hint{
+    font-size:11.5px;color:var(--ink-soft);line-height:1.6;
+    background:#fff;border:1px dashed var(--line);border-radius:8px;padding:8px 10px;
+  }
+  .bulk-form textarea{
+    width:100%;min-height:160px;padding:10px;border-radius:8px;border:1px solid var(--line);
+    font-family:inherit;font-size:16px;line-height:1.5;background:#fff;
+    resize:vertical;box-sizing:border-box;
+  }
+  .bulk-form .form-actions{display:flex;gap:8px;}
+  .bulk-form .form-actions button{
+    flex:1;padding:10px 0;border-radius:8px;font-weight:700;font-size:13px;
+    font-family:inherit;border:none;cursor:pointer;
+  }
+  .bulk-form .confirm{background:var(--green);color:#fff;}
+  .bulk-form .cancel{background:var(--line);color:var(--ink);}
+  .bulk-result{font-size:12.5px;color:var(--ink-soft);white-space:pre-line;line-height:1.6;}
 
   .search-wrap{margin:6px 20px 4px;}
   .search-wrap input{
     width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:8px;
-    font-size:14px;font-family:inherit;background:var(--paper-card);outline:none;
+    font-size:16px;font-family:inherit;background:var(--paper-card);outline:none;
   }
   .search-wrap input:focus{border-color:var(--green);}
   .hint-row{margin:2px 20px 0;font-size:11.5px;color:var(--ink-soft);}
@@ -337,7 +389,7 @@
   .edit-row label{font-size:11.5px;color:var(--ink-soft);font-weight:600;display:block;margin-bottom:3px;}
   .edit-row input, .edit-row select{
     width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--line);
-    font-family:inherit;font-size:14px;background:#fff;
+    font-family:inherit;font-size:16px;background:#fff;
   }
   .modal-actions{display:flex;gap:8px;}
   .modal-actions button{
@@ -354,8 +406,11 @@
 <body>
 <div class="app">
   <header>
-    <p class="eyebrow">サッカー部</p>
-    <h1>鳥取城北高校2年生<br>試合結果</h1>
+    <p class="eyebrow">チーム名</p>
+    <h1>
+      <input id="teamNameInput" class="team-name-input" type="text" placeholder="例）鳥取城北高校2年生" maxlength="40">
+      <br>試合結果
+    </h1>
     <div class="match-row">
       <div class="field opponent">
         <label for="opponent">対戦相手 <span style="color:#e08a6b;">必須</span></label>
@@ -370,9 +425,9 @@
 
   <div class="mode-tabs">
     <button class="mode-tab active" id="modeResult" data-mode="result">出場結果</button>
-    <button class="mode-tab" id="modeAssign" data-mode="assign">グループ分け</button>
+    <button class="mode-tab" id="modeAssign" data-mode="assign">選手登録</button>
   </div>
-  <p class="saved-note" id="assignSavedNote">グループ分け・名簿の変更はこの端末に保存され、閉じても消えません</p>
+  <p class="saved-note" id="assignSavedNote">選手登録・名簿の変更はこの端末に保存され、閉じても消えません</p>
   <p class="hint-row" id="longPressHint">選手名を長押しすると詳細・編集ができます</p>
 
   <div class="team-switch" id="teamSwitch" style="display:none;">
@@ -398,8 +453,8 @@
   <div class="goals-panel" id="goalsPanel" style="display:none;">
     <div class="goals-title">
       <span>得点・アシスト</span>
-      <button class="add-goal-btn" id="addGoalBtn">＋ 得点を追加</button>
     </div>
+    <button class="add-goal-btn" id="addGoalBtn">＋ 得点者を追加</button>
     <div id="goalForm"></div>
     <div id="goalList"></div>
   </div>
@@ -419,6 +474,16 @@
     <input id="search" type="text" placeholder="名前・背番号で検索">
   </div>
 
+  <div style="margin:10px 20px 0;display:flex;gap:8px;" id="addPlayerBtnWrap">
+    <button class="add-player-btn" id="addPlayerBtn" style="flex:1.3;">＋ 選手を登録</button>
+    <button class="bulk-btn" id="bulkBtn" style="flex:1;">一括登録・編集</button>
+  </div>
+  <div style="margin:8px 20px 0;" id="exportBtnWrap">
+    <button class="bulk-btn" id="exportBtn" style="width:100%;">選手データを出力（Excel/スプレッドシート用）</button>
+  </div>
+  <div id="addPlayerFormWrap" style="margin:0 20px;"></div>
+  <div id="bulkFormWrap" style="margin:0 20px;"></div>
+
   <div class="toolbar" id="assignToolbar">
     <span class="assign-counts">
       <span>A：<b id="countA">0</b>名</span>
@@ -426,11 +491,9 @@
       <span>未振分：<b id="countUn">0</b>名</span>
     </span>
     <span class="actions">
-      <button class="add-player-btn" id="addPlayerBtn">＋ 選手を登録</button>
       <button id="resetAssign">全解除</button>
     </span>
   </div>
-  <div id="addPlayerFormWrap" style="margin:0 20px;"></div>
 
   <div class="toolbar" id="checkToolbar" style="display:none;">
     <span id="visibleCount">0名</span>
@@ -451,6 +514,10 @@
       <label>課題点 <span class="req">必須</span></label>
       <textarea id="commentIssue" placeholder="例）セットプレーの守備対応に課題が残った"></textarea>
     </div>
+    <div class="comment-block other">
+      <label>コメント（任意）</label>
+      <textarea id="commentOther" placeholder="例）次回の練習で修正するポイントなど"></textarea>
+    </div>
   </div>
 
   <footer id="footer" style="display:none;">
@@ -467,6 +534,10 @@
 
   <div class="modal-overlay" id="confirmOverlay">
     <div class="modal-sheet" id="confirmSheet"></div>
+  </div>
+
+  <div class="modal-overlay" id="exportOverlay">
+    <div class="modal-sheet" id="exportSheet"></div>
   </div>
 </div>
 
@@ -518,52 +589,52 @@ const ROSTER_BASE = [
 ];
 
 const ROSTER_INFO = {
-  1:{height:171, origin:"東京", prevTeam:"デゼル東京"},
-  6:{height:173, origin:"鳥取", prevTeam:"鳥取南中学校"},
-  12:{height:170, origin:"神奈川", prevTeam:"パラブラFC"},
-  26:{height:169, origin:"東京", prevTeam:"FC渋谷"},
-  28:{height:174, origin:"岡山", prevTeam:"ディベルティールFC"},
-  50:{height:173, origin:"東京", prevTeam:"東京SC"},
-  53:{height:169, origin:"鳥取", prevTeam:"蹴友"},
-  54:{height:172, origin:"岡山", prevTeam:"アヴァンサール"},
-  62:{height:174, origin:"静岡", prevTeam:"湖東中学校"},
-  64:{height:173, origin:"鳥取", prevTeam:"鳥取南中学校"},
-  65:{height:167, origin:"鳥取", prevTeam:"鳥取東中学校"},
-  68:{height:172, origin:"鳥取", prevTeam:"鳥取KFC U-15"},
-  69:{height:169, origin:"静岡", prevTeam:"湖東中学校"},
-  70:{height:170, origin:"東京", prevTeam:"デゼル東京"},
-  71:{height:161, origin:"兵庫", prevTeam:"フォルテFC"},
-  72:{height:167, origin:"静岡", prevTeam:"湖東中学校"},
-  73:{height:167, origin:"兵庫", prevTeam:"フォルテFC"},
-  74:{height:165, origin:"鳥取", prevTeam:"江山学園中学校"},
-  75:{height:172, origin:"大阪", prevTeam:"大阪セゾン"},
-  76:{height:163, origin:"鳥取", prevTeam:"蹴友"},
-  77:{height:165, origin:"鳥取", prevTeam:"鳥取KFC U-15"},
-  78:{height:163, origin:"鳥取", prevTeam:"蹴友"},
-  79:{height:175, origin:"鳥取", prevTeam:"蹴友"},
-  80:{height:168, origin:"東京", prevTeam:"FC渋谷"},
-  81:{height:170, origin:"鳥取", prevTeam:"コラソンリーサ鳥取"},
-  82:{height:173, origin:"鳥取", prevTeam:"FCカミノ"},
-  83:{height:163, origin:"鳥取", prevTeam:"FCカミノ"},
-  84:{height:175, origin:"大阪", prevTeam:"大阪東淀川FC"},
-  85:{height:172, origin:"和歌山", prevTeam:"海南FCエンジェルス"},
-  86:{height:182, origin:"東京", prevTeam:"東京SC"},
-  87:{height:158, origin:"兵庫", prevTeam:"太子東中学校"},
-  88:{height:175, origin:"兵庫", prevTeam:"フォルテFC"},
-  89:{height:169, origin:"鳥取", prevTeam:"鳥取KFC U-15"},
-  90:{height:177, origin:"鳥取", prevTeam:"コラソンリーサ鳥取"},
-  91:{height:174, origin:"鳥取", prevTeam:"コラソンリーサ鳥取"},
-  92:{height:162, origin:"鳥取", prevTeam:"コラソンリーサ鳥取"},
-  93:{height:176, origin:"兵庫", prevTeam:"五色FC"},
-  94:{height:165, origin:"大阪", prevTeam:"大阪東淀川FC"},
-  95:{height:180, origin:"東京", prevTeam:"FC千代田"},
-  96:{height:164, origin:"鳥取", prevTeam:"コラソンリーサ鳥取"},
-  97:{height:172, origin:"大阪", prevTeam:"高槻ジークFC"},
-  98:{height:171, origin:"鳥取", prevTeam:"鳥取KFC U-15"},
-  99:{height:166, origin:"兵庫", prevTeam:"フォルテFC"},
+  1:{origin:"東京", prevTeam:"デゼル東京"},
+  6:{origin:"鳥取", prevTeam:"鳥取南中学校"},
+  12:{origin:"神奈川", prevTeam:"パラブラFC"},
+  26:{origin:"東京", prevTeam:"FC渋谷"},
+  28:{origin:"岡山", prevTeam:"ディベルティールFC"},
+  50:{origin:"東京", prevTeam:"東京SC"},
+  53:{origin:"鳥取", prevTeam:"蹴友"},
+  54:{origin:"岡山", prevTeam:"アヴァンサール"},
+  62:{origin:"静岡", prevTeam:"湖東中学校"},
+  64:{origin:"鳥取", prevTeam:"鳥取南中学校"},
+  65:{origin:"鳥取", prevTeam:"鳥取東中学校"},
+  68:{origin:"鳥取", prevTeam:"鳥取KFC U-15"},
+  69:{origin:"静岡", prevTeam:"湖東中学校"},
+  70:{origin:"東京", prevTeam:"デゼル東京"},
+  71:{origin:"兵庫", prevTeam:"フォルテFC"},
+  72:{origin:"静岡", prevTeam:"湖東中学校"},
+  73:{origin:"兵庫", prevTeam:"フォルテFC"},
+  74:{origin:"鳥取", prevTeam:"江山学園中学校"},
+  75:{origin:"大阪", prevTeam:"大阪セゾン"},
+  76:{origin:"鳥取", prevTeam:"蹴友"},
+  77:{origin:"鳥取", prevTeam:"鳥取KFC U-15"},
+  78:{origin:"鳥取", prevTeam:"蹴友"},
+  79:{origin:"鳥取", prevTeam:"蹴友"},
+  80:{origin:"東京", prevTeam:"FC渋谷"},
+  81:{origin:"鳥取", prevTeam:"コラソンリーサ鳥取"},
+  82:{origin:"鳥取", prevTeam:"FCカミノ"},
+  83:{origin:"鳥取", prevTeam:"FCカミノ"},
+  84:{origin:"大阪", prevTeam:"大阪東淀川FC"},
+  85:{origin:"和歌山", prevTeam:"海南FCエンジェルス"},
+  86:{origin:"東京", prevTeam:"東京SC"},
+  87:{origin:"兵庫", prevTeam:"太子東中学校"},
+  88:{origin:"兵庫", prevTeam:"フォルテFC"},
+  89:{origin:"鳥取", prevTeam:"鳥取KFC U-15"},
+  90:{origin:"鳥取", prevTeam:"コラソンリーサ鳥取"},
+  91:{origin:"鳥取", prevTeam:"コラソンリーサ鳥取"},
+  92:{origin:"鳥取", prevTeam:"コラソンリーサ鳥取"},
+  93:{origin:"兵庫", prevTeam:"五色FC"},
+  94:{origin:"大阪", prevTeam:"大阪東淀川FC"},
+  95:{origin:"東京", prevTeam:"FC千代田"},
+  96:{origin:"鳥取", prevTeam:"コラソンリーサ鳥取"},
+  97:{origin:"大阪", prevTeam:"高槻ジークFC"},
+  98:{origin:"鳥取", prevTeam:"鳥取KFC U-15"},
+  99:{origin:"兵庫", prevTeam:"フォルテFC"},
 };
 
-let overrides = {};   // no -> {name?,kana?,pos?,height?,origin?,prevTeam?}
+let overrides = {};   // no -> {name?,kana?,pos?,origin?,prevTeam?}
 let addedNos = [];    // no's of players registered via "選手を登録" (fully defined in overrides)
 let deletedNos = new Set(); // no's removed from the roster
 
@@ -578,7 +649,7 @@ function player(no){
   }
   // fully custom player
   const ov = overrides[no] || {};
-  return Object.assign({no, name:'（未設定）', kana:'', pos:'MF', height:null, origin:'', prevTeam:''}, ov);
+  return Object.assign({no, name:'（未設定）', kana:'', pos:'MF', origin:'', prevTeam:''}, ov);
 }
 
 function getAllNos(){
@@ -586,15 +657,45 @@ function getAllNos(){
   return nos.filter(no=>!deletedNos.has(no)).sort((a,b)=>a-b);
 }
 
+const POSITION_GROUPS = [
+  {label:'GK', options:['GK']},
+  {label:'DF', options:['DF','CB','SB','RB','LB','SW','WB']},
+  {label:'MF', options:['MF','DM','CM','AM','RM','LM']},
+  {label:'FW', options:['FW','CF','SS','RW','LW','ST']},
+];
+const POS_CATEGORY = {};
+POSITION_GROUPS.forEach(g=>{ g.options.forEach(o=>{ POS_CATEGORY[o] = g.label; }); });
+
+const POS_LABEL_JA = {
+  GK:'ゴールキーパー',
+  DF:'ディフェンダー', CB:'センターバック', SB:'サイドバック', RB:'ライトバック', LB:'レフトバック', SW:'スイーパー', WB:'ウイングバック',
+  MF:'ミッドフィルダー', DM:'ディフェンシブハーフ', CM:'センターミッドフィルダー', AM:'攻撃的ミッドフィルダー', RM:'ライトミッドフィルダー', LM:'レフトミッドフィルダー',
+  FW:'フォワード', CF:'センターフォワード', SS:'セカンドストライカー', RW:'ライトウイング', LW:'レフトウイング', ST:'ストライカー',
+};
+
+function posCategory(pos){
+  return POS_CATEGORY[pos] || 'MF';
+}
+
+function positionOptions(selected){
+  return POSITION_GROUPS.map(g=>
+    `<optgroup label="${g.label}">${g.options.map(o=>
+      `<option value="${o}" ${o===selected?'selected':''}>${o}：${POS_LABEL_JA[o] || o}</option>`
+    ).join('')}</optgroup>`
+  ).join('');
+}
+
 function teamLabel(team){
   return team === 'A' ? 'Group A' : 'Group B';
 }
 
+let teamName = '鳥取城北高校2年生';
 let mode = "assign";
 let currentTeam = "A";
 let currentHalf = "first";
 let goalFormOpen = false;
 let addPlayerFormOpen = false;
+let bulkFormOpen = false;
 let pendingHalf = 'first';
 
 let assignment = {};
@@ -603,7 +704,7 @@ let selected = {
   B: { first: new Set(), second: new Set() },
 };
 let scores = { A: { own: '', opp: '' }, B: { own: '', opp: '' } };
-let comments = { A: { good: '', issue: '' }, B: { good: '', issue: '' } };
+let comments = { A: { good: '', issue: '', other: '' }, B: { good: '', issue: '', other: '' } };
 let goals = { A: [], B: [] };
 
 const rosterEl = document.getElementById('roster');
@@ -661,7 +762,7 @@ function renderRoster(){
     if(mode === 'assign'){
       const a = assignment[p.no];
       rightControl = `
-        <span class="pos-badge ${p.pos}">${p.pos}</span>
+        <span class="pos-badge ${posCategory(p.pos)}">${p.pos}</span>
         <div class="ab-toggle">
           <button class="ab-btn ${a==='A' ? 'a-on':''}" data-act="assignA" data-no="${p.no}">A</button>
           <button class="ab-btn ${a==='B' ? 'b-on':''}" data-act="assignB" data-no="${p.no}">B</button>
@@ -672,7 +773,7 @@ function renderRoster(){
       const isChecked = selected[currentTeam][currentHalf].has(p.no);
       row.className = 'player checkable' + (isChecked ? ' checked' : '');
       rightControl = `
-        <span class="pos-badge ${p.pos}">${p.pos}</span>
+        <span class="pos-badge ${posCategory(p.pos)}">${p.pos}</span>
         <div class="check">
           <svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>`;
@@ -706,12 +807,7 @@ function renderRoster(){
     } else {
       row.addEventListener('click', ()=>{
         if(pressFired){ pressFired = false; return; }
-        const set = selected[currentTeam][currentHalf];
-        if(set.has(p.no)) set.delete(p.no);
-        else set.add(p.no);
-        persist();
-        renderRoster();
-        updateHalfCounts();
+        toggleAttendance(p.no);
       });
     }
 
@@ -724,7 +820,7 @@ function renderRoster(){
 
   if(visible === 0){
     if(mode === 'result'){
-      rosterEl.innerHTML = `<div class="empty-msg">${teamLabel(currentTeam)}に選手が振り分けられていません。<br><a id="goAssign">「グループ分け」</a>で先に選手を登録してください。</div>`;
+      rosterEl.innerHTML = `<div class="empty-msg">${teamLabel(currentTeam)}に選手が振り分けられていません。<br><a id="goAssign">「選手登録」</a>で先に選手を登録してください。</div>`;
       const link = document.getElementById('goAssign');
       if(link) link.addEventListener('click', ()=>switchMode('assign'));
     } else {
@@ -739,7 +835,7 @@ function deletePlayer(no){
   const p = player(no);
   showConfirmDialog(
     '選手を削除しますか？',
-    `${p.no} ${p.name} を名簿から削除します。\nグループ分け・出場結果・得点記録からも同時に削除され、元に戻せません。`,
+    `${p.no} ${p.name} を名簿から削除します。\n選手登録・出場結果・得点記録からも同時に削除され、元に戻せません。`,
     '削除する',
     ()=>{
       if(addedNos.includes(no)){
@@ -828,18 +924,11 @@ function renderAddPlayerForm(){
         <div style="flex:1;">
           <label>Pos.</label>
           <select id="npPos">
-            <option value="GK">GK</option>
-            <option value="DF">DF</option>
-            <option value="MF" selected>MF</option>
-            <option value="FW">FW</option>
+            ${positionOptions('MF')}
           </select>
         </div>
       </div>
       <div class="row">
-        <div style="flex:1;">
-          <label>身長 (cm)</label>
-          <input id="npHeight" type="number">
-        </div>
         <div style="flex:1;">
           <label>出身</label>
           <input id="npOrigin" type="text">
@@ -866,11 +955,10 @@ function renderAddPlayerForm(){
     if(!name){ showToast('氏名を入力してください'); return; }
     const kana = document.getElementById('npKana').value.trim();
     const pos = document.getElementById('npPos').value;
-    const height = document.getElementById('npHeight').value;
     const origin = document.getElementById('npOrigin').value.trim();
     const prevTeam = document.getElementById('npPrev').value.trim();
 
-    overrides[no] = { name, kana, pos, height: height ? Number(height) : null, origin, prevTeam };
+    overrides[no] = { name, kana, pos, origin, prevTeam };
     addedNos.push(no);
     deletedNos.delete(no);
 
@@ -880,6 +968,167 @@ function renderAddPlayerForm(){
     renderRoster();
     showToast('選手を登録しました');
   });
+}
+
+function buildRosterExport(){
+  const header = ['背番号','氏名','フリガナ','Pos','出身','前所属','グループ'].join('\t');
+  const rows = getAllNos().map(no=>{
+    const p = player(no);
+    const group = assignment[no] === 'A' ? 'A' : (assignment[no] === 'B' ? 'B' : '');
+    return [p.no, p.name, p.kana, p.pos, p.origin || '', p.prevTeam || '', group].join('\t');
+  });
+  return [header, ...rows].join('\n');
+}
+
+const exportOverlay = document.getElementById('exportOverlay');
+const exportSheet = document.getElementById('exportSheet');
+
+async function openExportSheet(){
+  const text = buildRosterExport();
+  exportSheet.innerHTML = `
+    <div class="modal-head">
+      <div class="modal-title"><div class="m-name">選手データ（出力）</div></div>
+      <button class="modal-close" id="exClose">✕</button>
+    </div>
+    <div class="confirm-msg">下の内容をコピーして、Excelやスプレッドシートのセルに直接貼り付けてください。列（背番号・氏名・フリガナ・Pos・出身・前所属・グループ）ごとに自動で分かれます。</div>
+    <textarea id="exportTextArea" readonly style="width:100%;min-height:220px;padding:10px;border:1px solid var(--line);border-radius:8px;font-family:inherit;font-size:16px;line-height:1.5;background:#fff;box-sizing:border-box;"></textarea>
+    <div class="modal-actions" style="margin-top:12px;">
+      <button class="cancel-btn" id="exCloseBtn">閉じる</button>
+      <button class="save-btn" id="exCopyBtn">コピーする</button>
+    </div>
+  `;
+  const ta = document.getElementById('exportTextArea');
+  ta.value = text;
+
+  const close = ()=>exportOverlay.classList.remove('show');
+  document.getElementById('exClose').addEventListener('click', close);
+  document.getElementById('exCloseBtn').addEventListener('click', close);
+  document.getElementById('exCopyBtn').addEventListener('click', async ()=>{
+    ta.focus();
+    ta.select();
+    ta.setSelectionRange(0, text.length);
+    const ok = await copyToClipboard(text);
+    showToast(ok ? 'コピーしました' : '自動コピーに失敗しました。上の欄を長押しして「すべて選択」→「コピー」してください');
+  });
+  exportOverlay.classList.add('show');
+
+  const auto = await copyToClipboard(text);
+  if(auto) showToast('コピーしました。Excel/スプレッドシートに貼り付けてください');
+}
+exportOverlay.addEventListener('click', (e)=>{ if(e.target === exportOverlay) exportOverlay.classList.remove('show'); });
+
+document.getElementById('exportBtn').addEventListener('click', ()=>{
+  if(getAllNos().length === 0){
+    showToast('出力できる選手がいません');
+    return;
+  }
+  openExportSheet();
+});
+
+document.getElementById('bulkBtn').addEventListener('click', ()=>{
+  bulkFormOpen = !bulkFormOpen;
+  renderBulkForm();
+});
+
+function parseBulkRow(line){
+  // Accept tab-separated (pasted from spreadsheets) or comma-separated.
+  const delim = line.includes('\t') ? '\t' : ',';
+  const cols = line.split(delim).map(c=>c.trim());
+  const [noStr, name, kana, pos, origin, prevTeam, group] = cols;
+  return { noStr, name, kana, pos, origin, prevTeam, group };
+}
+
+function renderBulkForm(){
+  const el = document.getElementById('bulkFormWrap');
+  if(!bulkFormOpen){ el.innerHTML=''; return; }
+  el.innerHTML = `
+    <div class="bulk-form">
+      <div>
+        <label>選手一覧を貼り付け</label>
+        <div class="bulk-hint">1行につき1人、背番号,氏名,フリガナ,Pos,出身,前所属,グループ の順（フリガナ以降は省略可）。グループはA・Bのいずれかを入力（空欄なら変更なし）。表計算ソフトから複数列コピペした場合はタブ区切りにも対応。既存の背番号と同じ場合は情報を上書き更新、新しい背番号は新規登録されます。</div>
+        <textarea id="bulkText" placeholder="12,山田太郎,ヤマダタロウ,MF,鳥取,〇〇FC,A&#10;13,佐藤次郎,サトウジロウ,DF,大阪,△△中学校,B"></textarea>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="cancel" id="bulkCancel">キャンセル</button>
+        <button type="button" class="confirm" id="bulkConfirm">取り込む</button>
+      </div>
+      <div class="bulk-result" id="bulkResult"></div>
+    </div>
+  `;
+  document.getElementById('bulkCancel').addEventListener('click', ()=>{
+    bulkFormOpen = false; renderBulkForm();
+  });
+  document.getElementById('bulkConfirm').addEventListener('click', ()=>{
+    const raw = document.getElementById('bulkText').value;
+    const lines = raw.split('\n').map(l=>l.trim()).filter(l=>l.length > 0);
+    if(lines.length === 0){ showToast('貼り付ける内容がありません'); return; }
+
+    let added = 0, updated = 0, skipped = 0;
+    const skippedLines = [];
+
+    lines.forEach(line=>{
+      const { noStr, name, kana, pos, origin, prevTeam, group } = parseBulkRow(line);
+      const no = Number(noStr);
+      if(!noStr || !Number.isFinite(no) || no <= 0 || !name){
+        skipped++; skippedLines.push(line);
+        return;
+      }
+      const posClean = (pos || '').toUpperCase();
+      const validPos = POS_CATEGORY[posClean] ? posClean : undefined;
+      const groupClean = (group || '').trim().toUpperCase();
+
+      const exists = getAllNos().includes(no);
+      const prevOverride = overrides[no] || {};
+      overrides[no] = {
+        name: name || prevOverride.name,
+        kana: kana !== undefined ? kana : prevOverride.kana,
+        pos: validPos || prevOverride.pos,
+        origin: origin !== undefined ? origin : prevOverride.origin,
+        prevTeam: prevTeam !== undefined ? prevTeam : prevOverride.prevTeam,
+      };
+
+      if(groupClean === 'A' || groupClean === 'B'){
+        assignment[no] = groupClean;
+      }
+      // 空欄・不正な値の場合は既存のグループ割り当てをそのまま維持する。
+
+      if(exists){
+        updated++;
+      } else {
+        addedNos.push(no);
+        deletedNos.delete(no);
+        added++;
+      }
+    });
+
+    persist();
+    persistOverrides();
+    renderRoster();
+
+    const resultEl = document.getElementById('bulkResult');
+    let msg = `新規登録：${added}件 / 更新：${updated}件`;
+    if(skipped > 0){
+      msg += ` / スキップ：${skipped}件（背番号か氏名が読み取れませんでした）`;
+    }
+    resultEl.textContent = msg;
+    showToast('取り込みが完了しました');
+  });
+}
+
+function toggleAttendance(no){
+  const set = selected[currentTeam][currentHalf];
+  const willAdd = !set.has(no);
+  if(willAdd) set.add(no); else set.delete(no);
+
+  // 前半での選択は後半にも引き継ぐ（一方向）。後半での変更は前半に影響させない。
+  if(currentHalf === 'first'){
+    const secondSet = selected[currentTeam].second;
+    if(willAdd) secondSet.add(no); else secondSet.delete(no);
+  }
+
+  persist();
+  renderRoster();
+  updateHalfCounts();
 }
 
 function toggleAssignment(no, team){
@@ -917,7 +1166,9 @@ function switchMode(m){
   mode = m;
   goalFormOpen = false;
   addPlayerFormOpen = false;
+  bulkFormOpen = false;
   renderAddPlayerForm();
+  renderBulkForm();
   document.getElementById('modeAssign').classList.toggle('active', m==='assign');
   document.getElementById('modeResult').classList.toggle('active', m==='result');
 
@@ -929,6 +1180,8 @@ function switchMode(m){
   document.getElementById('halfTabs').style.display = showResult ? 'flex' : 'none';
   document.getElementById('footer').style.display = 'block';
   document.getElementById('assignToolbar').style.display = showResult ? 'none' : 'flex';
+  document.getElementById('addPlayerBtnWrap').style.display = showResult ? 'none' : 'flex';
+  document.getElementById('exportBtnWrap').style.display = showResult ? 'none' : 'block';
   document.getElementById('checkToolbar').style.display = showResult ? 'flex' : 'none';
   document.getElementById('assignSavedNote').style.display = showResult ? 'none' : 'block';
 
@@ -936,7 +1189,7 @@ function switchMode(m){
   if(!showResult){
     sendBtn.classList.remove('teamA','teamB');
     sendBtn.classList.add('assignMode');
-    document.getElementById('sendLineLabel').textContent = 'テキストをコピー＆LINEを開く（グループ分け一覧）';
+    document.getElementById('sendLineLabel').textContent = 'テキストをコピー＆LINEを開く（選手登録一覧）';
   } else {
     sendBtn.classList.remove('assignMode');
     sendBtn.classList.add(currentTeam === 'A' ? 'teamA' : 'teamB');
@@ -962,6 +1215,7 @@ function switchTeam(team){
   document.getElementById('scoreOpp').value = scores[team].opp;
   document.getElementById('commentGood').value = comments[team].good;
   document.getElementById('commentIssue').value = comments[team].issue;
+  document.getElementById('commentOther').value = comments[team].other;
 
   renderGoals();
   renderRoster();
@@ -990,7 +1244,10 @@ document.getElementById('checkAll').addEventListener('click', ()=>{
     if(assignment[no] !== currentTeam) return;
     const p = player(no);
     const hay = (p.name + p.kana + p.no).toLowerCase();
-    if(!q || hay.includes(q)) selected[currentTeam][currentHalf].add(no);
+    if(!q || hay.includes(q)){
+      selected[currentTeam][currentHalf].add(no);
+      if(currentHalf === 'first') selected[currentTeam].second.add(no);
+    }
   });
   persist(); renderRoster(); updateHalfCounts();
 });
@@ -1000,7 +1257,10 @@ document.getElementById('uncheckAll').addEventListener('click', ()=>{
     if(assignment[no] !== currentTeam) return;
     const p = player(no);
     const hay = (p.name + p.kana + p.no).toLowerCase();
-    if(!q || hay.includes(q)) selected[currentTeam][currentHalf].delete(no);
+    if(!q || hay.includes(q)){
+      selected[currentTeam][currentHalf].delete(no);
+      if(currentHalf === 'first') selected[currentTeam].second.delete(no);
+    }
   });
   persist(); renderRoster(); updateHalfCounts();
 });
@@ -1023,6 +1283,9 @@ document.getElementById('commentGood').addEventListener('input', (e)=>{
 document.getElementById('commentIssue').addEventListener('input', (e)=>{
   comments[currentTeam].issue = e.target.value; persist();
 });
+document.getElementById('commentOther').addEventListener('input', (e)=>{
+  comments[currentTeam].other = e.target.value; persist();
+});
 
 // ---- goals ----
 function teamRosterOptions(){
@@ -1034,7 +1297,7 @@ function teamRosterOptions(){
 
 document.getElementById('addGoalBtn').addEventListener('click', ()=>{
   if(getAllNos().filter(no=>assignment[no]===currentTeam).length === 0){
-    showToast('先にグループ分けで選手を登録してください');
+    showToast('先に選手登録で選手を登録してください');
     return;
   }
   goalFormOpen = true;
@@ -1162,6 +1425,7 @@ function buildMessage(){
   const opp = scores[currentTeam].opp;
   const good = comments[currentTeam].good.trim();
   const issue = comments[currentTeam].issue.trim();
+  const other = comments[currentTeam].other.trim();
 
   let msg = `【${teamLabel(currentTeam)}】${opponent}戦${dateStr ? ' ' + dateStr : ''}\n`;
   msg += `━━━━━━━━━━\n`;
@@ -1184,6 +1448,10 @@ function buildMessage(){
   msg += `良かった点\n${good}\n`;
   msg += `━━━━━━━━━━\n`;
   msg += `課題点\n${issue}\n`;
+  if(other){
+    msg += `━━━━━━━━━━\n`;
+    msg += `コメント\n${other}\n`;
+  }
   msg += `━━━━━━━━━━\n`;
   msg += `前半 出場（${firstList.length}名）\n`;
   msg += firstList.length ? firstList.map(p=>`${String(p.no).padStart(2,' ')} ${p.name}（${p.pos}）`).join('\n') : '（未選択）';
@@ -1196,7 +1464,6 @@ function buildMessage(){
 function formatPlayerDetailLine(p){
   let line = `${String(p.no).padStart(2,' ')} ${p.name}（${p.kana}）${p.pos}`;
   const extra = [];
-  if(p.height) extra.push(`${p.height}cm`);
   if(p.origin) extra.push(p.origin);
   if(p.prevTeam) extra.push(p.prevTeam);
   if(extra.length) line += `\n     ${extra.join(' / ')}`;
@@ -1212,7 +1479,7 @@ function buildAssignMessage(){
   });
   ['A','B','none'].forEach(k=>groups[k].sort((a,b)=>a.no-b.no));
 
-  let msg = `グループ分け一覧（鳥取城北高校2年生）\n`;
+  let msg = `選手登録一覧（${teamName}）\n`;
   msg += `━━━━━━━━━━\n`;
   msg += `Group A（${groups.A.length}名）\n`;
   msg += groups.A.length ? groups.A.map(formatPlayerDetailLine).join('\n') : '（登録なし）';
@@ -1240,11 +1507,20 @@ async function copyToClipboard(text){
   try{
     const ta = document.createElement('textarea');
     ta.value = text;
+    ta.setAttribute('readonly', '');
     ta.style.position = 'fixed';
-    ta.style.left = '-9999px';
+    ta.style.top = '0';
+    ta.style.left = '0';
+    ta.style.width = '1px';
+    ta.style.height = '1px';
+    ta.style.padding = '0';
+    ta.style.border = 'none';
+    ta.style.opacity = '0';
+    ta.style.fontSize = '16px';
     document.body.appendChild(ta);
     ta.focus();
     ta.select();
+    ta.setSelectionRange(0, text.length); // iOS Safari needs this in addition to .select()
     const ok = document.execCommand('copy');
     document.body.removeChild(ta);
     return ok;
@@ -1300,8 +1576,7 @@ function renderModal(){
         <button class="modal-close" id="mClose">✕</button>
       </div>
       <div class="detail-grid">
-        <div class="detail-row"><span class="d-label">ポジション</span><span class="d-value">${p.pos}</span></div>
-        <div class="detail-row"><span class="d-label">身長</span><span class="d-value">${p.height ? p.height + ' cm' : '未登録'}</span></div>
+        <div class="detail-row"><span class="d-label">ポジション</span><span class="d-value">${p.pos}${POS_LABEL_JA[p.pos] ? '：' + POS_LABEL_JA[p.pos] : ''}</span></div>
         <div class="detail-row"><span class="d-label">出身</span><span class="d-value">${p.origin || '未登録'}</span></div>
         <div class="detail-row"><span class="d-label">前所属</span><span class="d-value">${p.prevTeam || '未登録'}</span></div>
       </div>
@@ -1323,10 +1598,9 @@ function renderModal(){
         <div class="edit-row"><label>フリガナ</label><input id="eKana" value="${p.kana}"></div>
         <div class="edit-row"><label>ポジション</label>
           <select id="ePos">
-            ${['GK','DF','MF','FW'].map(v=>`<option value="${v}" ${p.pos===v?'selected':''}>${v}</option>`).join('')}
+            ${positionOptions(p.pos)}
           </select>
         </div>
-        <div class="edit-row"><label>身長 (cm)</label><input id="eHeight" type="number" value="${p.height||''}"></div>
         <div class="edit-row"><label>出身</label><input id="eOrigin" value="${p.origin||''}"></div>
         <div class="edit-row"><label>前所属</label><input id="ePrev" value="${p.prevTeam||''}"></div>
       </div>
@@ -1341,14 +1615,12 @@ function renderModal(){
       const name = document.getElementById('eName').value.trim();
       const kana = document.getElementById('eKana').value.trim();
       const pos = document.getElementById('ePos').value;
-      const height = document.getElementById('eHeight').value;
       const origin = document.getElementById('eOrigin').value.trim();
       const prevTeam = document.getElementById('ePrev').value.trim();
       overrides[modalNo] = {
         name: name || undefined,
         kana: kana || undefined,
         pos: pos || undefined,
-        height: height ? Number(height) : undefined,
         origin: origin || undefined,
         prevTeam: prevTeam || undefined,
       };
@@ -1409,6 +1681,10 @@ async function persistOverrides(){
   }));
 }
 
+async function persistTeamName(){
+  await storageSet('team-name', teamName);
+}
+
 async function loadPersisted(){
   let raw = await storageGet('lineup-draft-v5');
   if(!raw) raw = await storageGet('lineup-draft-v4'); // migrate from earlier version
@@ -1417,7 +1693,7 @@ async function loadPersisted(){
       const data = JSON.parse(raw);
       // 対戦相手・試合結果(得点)・得点者/アシスト・出場選手チェック・コメントは
       // 毎回リセットする仕様のため、ここでは意図的に復元しない。
-      // グループ分け（A/B振り分け）のみ復元する。
+      // 選手登録（A/B振り分け・名簿）のみ復元する。
       assignment = data.assignment || {};
     }catch(e){ /* corrupt draft, ignore */ }
   }
@@ -1425,7 +1701,7 @@ async function loadPersisted(){
   document.getElementById('opponent').value = '';
   scores = { A:{own:'',opp:''}, B:{own:'',opp:''} };
   goals = { A: [], B: [] };
-  comments = { A:{good:'',issue:''}, B:{good:'',issue:''} };
+  comments = { A:{good:'',issue:'',other:''}, B:{good:'',issue:'',other:''} };
   selected = {
     A: { first: new Set(), second: new Set() },
     B: { first: new Set(), second: new Set() },
@@ -1445,19 +1721,29 @@ async function loadPersisted(){
       try{ overrides = JSON.parse(legacy) || {}; }catch(e){ /* ignore */ }
     }
   }
+
+  // チーム名はアプリを閉じても保持する（対戦相手などとは違いリセットしない）。
+  const savedTeamName = await storageGet('team-name');
+  if(savedTeamName) teamName = savedTeamName;
 }
 
 document.getElementById('opponent').addEventListener('input', persist);
 document.getElementById('matchDate').addEventListener('input', persist);
+document.getElementById('teamNameInput').addEventListener('input', (e)=>{
+  teamName = e.target.value.trim() || '鳥取城北高校2年生';
+  persistTeamName();
+});
 
 (async function init(){
   const today = new Date();
   document.getElementById('matchDate').value = today.toISOString().slice(0,10);
   await loadPersisted();
+  document.getElementById('teamNameInput').value = teamName;
   document.getElementById('scoreOwn').value = scores.A.own;
   document.getElementById('scoreOpp').value = scores.A.opp;
   document.getElementById('commentGood').value = comments.A.good;
   document.getElementById('commentIssue').value = comments.A.issue;
+  document.getElementById('commentOther').value = comments.A.other;
   switchMode('result');
 })();
 </script>
