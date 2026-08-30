@@ -543,96 +543,10 @@
 
 <script>
 const ROSTER_BASE = [
-  {no:1, name:"西田夏那太", kana:"ニシダ カナタ", pos:"GK"},
-  {no:6, name:"渡邉康成", kana:"ワタナベ ヤスナリ", pos:"DF"},
-  {no:12, name:"アジャ愛来", kana:"アジャ アイク", pos:"MF"},
-  {no:26, name:"雨宮太陽", kana:"アメミヤ タイヨウ", pos:"FW"},
-  {no:28, name:"池田大輝", kana:"イケダ ダイキ", pos:"DF"},
-  {no:50, name:"井澤遼", kana:"イザワ リョウ", pos:"DF"},
-  {no:53, name:"石川瑠良", kana:"イシカワ ルイ", pos:"DF"},
-  {no:54, name:"井上臣人", kana:"イノウエ オミト", pos:"DF"},
-  {no:62, name:"大野史人", kana:"オオノ フミト", pos:"DF"},
-  {no:64, name:"岡本瑛斗", kana:"オカモト エイト", pos:"DF"},
-  {no:65, name:"尾﨑将大", kana:"オサキ マサヒロ", pos:"MF"},
-  {no:68, name:"北村優", kana:"キタムラ ユウ", pos:"DF"},
-  {no:69, name:"木村翔愛", kana:"キムラ トア", pos:"MF"},
-  {no:70, name:"樹山翔陽", kana:"キヤマ ショウヨウ", pos:"FW"},
-  {no:71, name:"小寺悠月", kana:"コデラ ユヅキ", pos:"FW"},
-  {no:72, name:"澤勇斗", kana:"サワ ユウト", pos:"FW"},
-  {no:73, name:"鈴田海翔", kana:"スズタ カイト", pos:"MF"},
-  {no:74, name:"田中漣", kana:"タナカ レン", pos:"MF"},
-  {no:75, name:"谷田蓮斗", kana:"タニダ レント", pos:"MF"},
-  {no:76, name:"田村勇次郎", kana:"タムラ ユウジロウ", pos:"DF"},
-  {no:77, name:"中田豪", kana:"ナカタ ゴウ", pos:"DF"},
-  {no:78, name:"中谷風埜", kana:"ナカタニ フウヤ", pos:"MF"},
-  {no:79, name:"中谷凛恩", kana:"ナカタニ リオン", pos:"MF"},
-  {no:80, name:"西尾友佑", kana:"ニシオ ユウスケ", pos:"DF"},
-  {no:81, name:"西口飛呂", kana:"ニシグチ ヒロ", pos:"MF"},
-  {no:82, name:"西谷颯馬", kana:"ニシタニ ソウマ", pos:"MF"},
-  {no:83, name:"秦野寛人", kana:"ハタノ ヒロト", pos:"MF"},
-  {no:84, name:"濱田蒼真", kana:"ハマダ ソウマ", pos:"MF"},
-  {no:85, name:"東知叶", kana:"ヒガシ ハルト", pos:"MF"},
-  {no:86, name:"平澤悠", kana:"ヒラサワ ユウ", pos:"DF"},
-  {no:87, name:"廣橋一心", kana:"ヒロハシ イッシン", pos:"MF"},
-  {no:88, name:"深澤一樹", kana:"フカザワ カズキ", pos:"DF"},
-  {no:89, name:"前田恭李", kana:"マエタ キョウイ", pos:"MF"},
-  {no:90, name:"マクラフリン優志", kana:"マクラフリン ユウシ", pos:"GK"},
-  {no:91, name:"松野倫來", kana:"マツノ トモキ", pos:"FW"},
-  {no:92, name:"松本蒼", kana:"マツモト ソウ", pos:"MF"},
-  {no:93, name:"村上龍牙", kana:"ムラカミ リュウガ", pos:"DF"},
-  {no:94, name:"村田來斗", kana:"ムラタ ライト", pos:"MF"},
-  {no:95, name:"森琥太郎", kana:"モリ コタロウ", pos:"GK"},
-  {no:96, name:"森田琉希", kana:"モリタ ルキ", pos:"MF"},
-  {no:97, name:"山田龍之介", kana:"ヤマダ リュウノスケ", pos:"MF"},
-  {no:98, name:"山根照登", kana:"ヤマネ テルト", pos:"DF"},
-  {no:99, name:"弓場前", kana:"ユミバ ゼン", pos:"GK"},
+  // 初期名簿なし。「選手登録」または「一括登録・編集」から選手を追加してください。
 ];
 
-const ROSTER_INFO = {
-  1:{origin:"東京", prevTeam:"デゼル東京"},
-  6:{origin:"鳥取", prevTeam:"鳥取南中学校"},
-  12:{origin:"神奈川", prevTeam:"パラブラFC"},
-  26:{origin:"東京", prevTeam:"FC渋谷"},
-  28:{origin:"岡山", prevTeam:"ディベルティールFC"},
-  50:{origin:"東京", prevTeam:"東京SC"},
-  53:{origin:"鳥取", prevTeam:"蹴友"},
-  54:{origin:"岡山", prevTeam:"アヴァンサール"},
-  62:{origin:"静岡", prevTeam:"湖東中学校"},
-  64:{origin:"鳥取", prevTeam:"鳥取南中学校"},
-  65:{origin:"鳥取", prevTeam:"鳥取東中学校"},
-  68:{origin:"鳥取", prevTeam:"鳥取KFC U-15"},
-  69:{origin:"静岡", prevTeam:"湖東中学校"},
-  70:{origin:"東京", prevTeam:"デゼル東京"},
-  71:{origin:"兵庫", prevTeam:"フォルテFC"},
-  72:{origin:"静岡", prevTeam:"湖東中学校"},
-  73:{origin:"兵庫", prevTeam:"フォルテFC"},
-  74:{origin:"鳥取", prevTeam:"江山学園中学校"},
-  75:{origin:"大阪", prevTeam:"大阪セゾン"},
-  76:{origin:"鳥取", prevTeam:"蹴友"},
-  77:{origin:"鳥取", prevTeam:"鳥取KFC U-15"},
-  78:{origin:"鳥取", prevTeam:"蹴友"},
-  79:{origin:"鳥取", prevTeam:"蹴友"},
-  80:{origin:"東京", prevTeam:"FC渋谷"},
-  81:{origin:"鳥取", prevTeam:"コラソンリーサ鳥取"},
-  82:{origin:"鳥取", prevTeam:"FCカミノ"},
-  83:{origin:"鳥取", prevTeam:"FCカミノ"},
-  84:{origin:"大阪", prevTeam:"大阪東淀川FC"},
-  85:{origin:"和歌山", prevTeam:"海南FCエンジェルス"},
-  86:{origin:"東京", prevTeam:"東京SC"},
-  87:{origin:"兵庫", prevTeam:"太子東中学校"},
-  88:{origin:"兵庫", prevTeam:"フォルテFC"},
-  89:{origin:"鳥取", prevTeam:"鳥取KFC U-15"},
-  90:{origin:"鳥取", prevTeam:"コラソンリーサ鳥取"},
-  91:{origin:"鳥取", prevTeam:"コラソンリーサ鳥取"},
-  92:{origin:"鳥取", prevTeam:"コラソンリーサ鳥取"},
-  93:{origin:"兵庫", prevTeam:"五色FC"},
-  94:{origin:"大阪", prevTeam:"大阪東淀川FC"},
-  95:{origin:"東京", prevTeam:"FC千代田"},
-  96:{origin:"鳥取", prevTeam:"コラソンリーサ鳥取"},
-  97:{origin:"大阪", prevTeam:"高槻ジークFC"},
-  98:{origin:"鳥取", prevTeam:"鳥取KFC U-15"},
-  99:{origin:"兵庫", prevTeam:"フォルテFC"},
-};
+const ROSTER_INFO = {};
 
 let overrides = {};   // no -> {name?,kana?,pos?,origin?,prevTeam?}
 let addedNos = [];    // no's of players registered via "選手を登録" (fully defined in overrides)
@@ -1038,6 +952,57 @@ function parseBulkRow(line){
   return { noStr, name, kana, pos, origin, prevTeam, group };
 }
 
+// 「テキストをコピー」で出力される選手登録一覧の形式（Group A/B見出し＋
+// "no 氏名（フリガナ）POS" とその下の "出身 / 前所属" 行）かどうかを判定する。
+function looksLikeCopyFormat(raw){
+  return /Group\s+[AB]/.test(raw) || /未振分/.test(raw);
+}
+
+const TEAM_NAME_HINTS = ['FC','SC','KFC','JFC','U-','U15','中学校','高校','クラブ','SS','FCジュニア','蹴友'];
+
+function parseCopyFormatText(raw){
+  const headerRe = /^(\d+)\s+(.+?)（(.+?)）\s*([A-Za-z]{2,3})\s*$/;
+  const groupRe = /^Group\s+([AB])/;
+  const noneRe = /^未振分/;
+  const sepRe = /^[━\-=]{3,}$/;
+
+  const results = [];
+  let currentGroup = null;
+  let last = null;
+
+  raw.split('\n').forEach(rawLine=>{
+    const line = rawLine.trim();
+    if(!line || sepRe.test(line)) return;
+
+    const gm = line.match(groupRe);
+    if(gm){ currentGroup = gm[1]; last = null; return; }
+    if(noneRe.test(line)){ currentGroup = null; last = null; return; }
+
+    const hm = line.match(headerRe);
+    if(hm){
+      const [, noStr, name, kana, pos] = hm;
+      last = { noStr, name, kana, pos: pos.toUpperCase(), origin:'', prevTeam:'', group: currentGroup };
+      results.push(last);
+      return;
+    }
+
+    // 出身・前所属の詳細行（直前の選手に紐づける）
+    if(last){
+      const parts = line.split('/').map(s=>s.trim()).filter(Boolean);
+      if(parts.length >= 2){
+        last.origin = parts[0];
+        last.prevTeam = parts.slice(1).join(' / ');
+      } else if(parts.length === 1){
+        const val = parts[0];
+        if(TEAM_NAME_HINTS.some(h=>val.includes(h))) last.prevTeam = val;
+        else last.origin = val;
+      }
+    }
+  });
+
+  return results;
+}
+
 function renderBulkForm(){
   const el = document.getElementById('bulkFormWrap');
   if(!bulkFormOpen){ el.innerHTML=''; return; }
@@ -1045,7 +1010,7 @@ function renderBulkForm(){
     <div class="bulk-form">
       <div>
         <label>選手一覧を貼り付け</label>
-        <div class="bulk-hint">1行につき1人、背番号,氏名,フリガナ,Pos,出身,前所属,グループ の順（フリガナ以降は省略可）。グループはA・Bのいずれかを入力（空欄なら変更なし）。表計算ソフトから複数列コピペした場合はタブ区切りにも対応。既存の背番号と同じ場合は情報を上書き更新、新しい背番号は新規登録されます。</div>
+        <div class="bulk-hint">2通りの貼り付け方に対応しています。①Excel/スプレッドシート形式：1行につき1人、背番号,氏名,フリガナ,Pos,出身,前所属,グループ の順（フリガナ以降は省略可、グループはA・Bのいずれか）。②「テキストをコピー」で出力した選手登録一覧をそのまま貼り付けてもOK。どちらも既存の背番号と同じなら上書き更新、新しい背番号は新規登録されます。</div>
         <textarea id="bulkText" placeholder="12,山田太郎,ヤマダタロウ,MF,鳥取,〇〇FC,A&#10;13,佐藤次郎,サトウジロウ,DF,大阪,△△中学校,B"></textarea>
       </div>
       <div class="form-actions">
@@ -1060,17 +1025,23 @@ function renderBulkForm(){
   });
   document.getElementById('bulkConfirm').addEventListener('click', ()=>{
     const raw = document.getElementById('bulkText').value;
-    const lines = raw.split('\n').map(l=>l.trim()).filter(l=>l.length > 0);
-    if(lines.length === 0){ showToast('貼り付ける内容がありません'); return; }
+    if(!raw.trim()){ showToast('貼り付ける内容がありません'); return; }
+
+    let rows;
+    if(looksLikeCopyFormat(raw)){
+      rows = parseCopyFormatText(raw);
+    } else {
+      rows = raw.split('\n').map(l=>l.trim()).filter(l=>l.length > 0).map(parseBulkRow);
+    }
+    if(rows.length === 0){ showToast('貼り付ける内容がありません'); return; }
 
     let added = 0, updated = 0, skipped = 0;
-    const skippedLines = [];
 
-    lines.forEach(line=>{
-      const { noStr, name, kana, pos, origin, prevTeam, group } = parseBulkRow(line);
+    rows.forEach(row=>{
+      const { noStr, name, kana, pos, origin, prevTeam, group } = row;
       const no = Number(noStr);
       if(!noStr || !Number.isFinite(no) || no <= 0 || !name){
-        skipped++; skippedLines.push(line);
+        skipped++;
         return;
       }
       const posClean = (pos || '').toUpperCase();
@@ -1457,7 +1428,11 @@ function buildMessage(){
   msg += firstList.length ? firstList.map(p=>`${String(p.no).padStart(2,' ')} ${p.name}（${p.pos}）`).join('\n') : '（未選択）';
   msg += `\n━━━━━━━━━━\n`;
   msg += `後半 出場（${secondList.length}名）\n`;
-  msg += secondList.length ? secondList.map(p=>`${String(p.no).padStart(2,' ')} ${p.name}（${p.pos}）`).join('\n') : '（未選択）';
+  const firstNos = new Set(firstList.map(p=>p.no));
+  msg += secondList.length ? secondList.map(p=>{
+    const sub = !firstNos.has(p.no) ? '（後）' : '';
+    return `${String(p.no).padStart(2,' ')} ${p.name}（${p.pos}）${sub}`;
+  }).join('\n') : '（未選択）';
   return msg;
 }
 
