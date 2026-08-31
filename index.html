@@ -276,6 +276,12 @@
   .bulk-result{font-size:12.5px;color:var(--ink-soft);white-space:pre-line;line-height:1.6;}
 
   .search-wrap{margin:6px 20px 4px;}
+  .sort-toggle{display:flex;gap:6px;margin:0 20px 4px;}
+  .sort-btn{
+    padding:5px 12px;border-radius:999px;border:1.5px solid var(--line);background:var(--paper-card);
+    font-size:11.5px;font-weight:700;font-family:inherit;color:var(--ink-soft);cursor:pointer;
+  }
+  .sort-btn.active{background:var(--navy);border-color:var(--navy);color:#fff;}
   .search-wrap input{
     width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:8px;
     font-size:16px;font-family:inherit;background:var(--paper-card);outline:none;
@@ -297,8 +303,8 @@
     font-variant-numeric:tabular-nums;
   }
   .info{flex:1;min-width:0;-webkit-user-select:none;}
-  .name{font-size:15px;font-weight:600;line-height:1.3;}
-  .kana{font-size:11px;color:var(--ink-soft);letter-spacing:.02em;}
+  .name{font-size:15px;font-weight:600;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .kana{font-size:11px;color:var(--ink-soft);letter-spacing:.02em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .pos-badge{
     flex:none;font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;color:#fff;
   }
@@ -313,6 +319,17 @@
   }
   .ab-btn.a-on{background:var(--teamA);border-color:var(--teamA);color:#fff;}
   .ab-btn.b-on{background:var(--teamB);border-color:var(--teamB);color:#fff;}
+  .appear-toggle{flex:none;display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;max-width:130px;}
+  .player.result-row{flex-wrap:wrap;row-gap:8px;}
+  .player.result-row .appear-toggle{flex:1 1 100%;justify-content:flex-start;max-width:none;padding-left:44px;}
+  .appear-btn{
+    padding:7px 10px;border-radius:8px;border:1.5px solid var(--line);background:#fff;
+    font-size:13.5px;font-weight:800;font-family:inherit;color:var(--ink-soft);cursor:pointer;
+    white-space:nowrap;line-height:1.3;
+  }
+  .appear-btn.on-starter{background:var(--green);border-color:var(--green);color:#fff;}
+  .appear-btn.on-sub{background:var(--posDF);border-color:var(--posDF);color:#fff;}
+  .appear-btn.on-suboff{background:var(--posFW);border-color:var(--posFW);color:#fff;}
   .del-btn{
     flex:none;width:26px;height:26px;border-radius:7px;border:1.5px solid var(--line);
     background:#fff;color:var(--red);font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;
@@ -459,19 +476,28 @@
     <div id="goalList"></div>
   </div>
 
-  <div class="tabs" id="halfTabs" style="display:none;">
-    <button class="tab active" id="tabFirst" data-half="first">
-      前半
-      <span class="count" id="countFirst">出場 0名</span>
-    </button>
-    <button class="tab" id="tabSecond" data-half="second">
-      後半
-      <span class="count" id="countSecond">出場 0名</span>
-    </button>
+  <div class="tabs" id="appearanceSummary" style="display:none;">
+    <div class="tab" style="cursor:default;">
+      スタメン
+      <span class="count" id="countStarter">0名</span>
+    </div>
+    <div class="tab" style="cursor:default;">
+      途中出場
+      <span class="count" id="countSub">0名</span>
+    </div>
+    <div class="tab" style="cursor:default;">
+      途中退場
+      <span class="count" id="countSubOff">0名</span>
+    </div>
   </div>
 
   <div class="search-wrap">
     <input id="search" type="text" placeholder="名前・背番号で検索">
+  </div>
+
+  <div class="sort-toggle">
+    <button class="sort-btn" id="sortByNo">背番号順</button>
+    <button class="sort-btn active" id="sortByPos">ポジション順</button>
   </div>
 
   <div style="margin:10px 20px 0;display:flex;gap:8px;" id="addPlayerBtnWrap">
@@ -498,8 +524,7 @@
   <div class="toolbar" id="checkToolbar" style="display:none;">
     <span id="visibleCount">0名</span>
     <span class="actions">
-      <button id="checkAll">全選択</button>
-      <button id="uncheckAll">解除</button>
+      <button id="clearAppearance">全解除</button>
     </span>
   </div>
 
@@ -591,6 +616,14 @@ function posCategory(pos){
   return POS_CATEGORY[pos] || 'MF';
 }
 
+function positionSortIndex(pos){
+  for(let gi=0; gi<POSITION_GROUPS.length; gi++){
+    const idx = POSITION_GROUPS[gi].options.indexOf(pos);
+    if(idx !== -1) return gi*100 + idx;
+  }
+  return 9999;
+}
+
 function positionOptions(selected){
   return POSITION_GROUPS.map(g=>
     `<optgroup label="${g.label}">${g.options.map(o=>
@@ -606,16 +639,16 @@ function teamLabel(team){
 let teamName = '鳥取城北高校';
 let mode = "assign";
 let currentTeam = "A";
-let currentHalf = "first";
+let sortMode = "pos"; // 'no' | 'pos'
 let goalFormOpen = false;
 let addPlayerFormOpen = false;
 let bulkFormOpen = false;
-let pendingHalf = 'first';
+let pendingHalf = 'first'; // ゴール登録（得点のタイミング）用。出場記録とは別の概念。
 
 let assignment = {};
-let selected = {
-  A: { first: new Set(), second: new Set() },
-  B: { first: new Set(), second: new Set() },
+let appearance = {
+  A: { starter: new Set(), sub: new Set(), subOff: new Set() },
+  B: { starter: new Set(), sub: new Set(), subOff: new Set() },
 };
 let scores = { A: { own: '', opp: '' }, B: { own: '', opp: '' } };
 let comments = { A: { good: '', issue: '', other: '' }, B: { good: '', issue: '', other: '' } };
@@ -664,6 +697,9 @@ function renderRoster(){
     if(mode === 'result' && assignment[p.no] !== currentTeam) return false;
     return true;
   });
+  if(sortMode === 'pos'){
+    list.sort((a,b)=> positionSortIndex(a.pos) - positionSortIndex(b.pos) || a.no - b.no);
+  }
 
   list.forEach(p=>{
     const hay = (p.name + p.kana + p.no).toLowerCase();
@@ -684,12 +720,17 @@ function renderRoster(){
         <button class="del-btn" data-act="delete" data-no="${p.no}" title="名簿から削除">✕</button>`;
       row.className = 'player';
     } else {
-      const isChecked = selected[currentTeam][currentHalf].has(p.no);
-      row.className = 'player checkable' + (isChecked ? ' checked' : '');
+      const tags = appearance[currentTeam];
+      const isStarter = tags.starter.has(p.no);
+      const isSub = tags.sub.has(p.no);
+      const isSubOff = tags.subOff.has(p.no);
+      row.className = 'player result-row' + ((isStarter || isSub || isSubOff) ? ' checked' : '');
       rightControl = `
         <span class="pos-badge ${posCategory(p.pos)}">${p.pos}</span>
-        <div class="check">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="appear-toggle">
+          <button class="appear-btn ${isStarter ? 'on-starter':''}" data-act="starter" data-no="${p.no}">スタメン</button>
+          <button class="appear-btn ${isSub ? 'on-sub':''}" data-act="sub" data-no="${p.no}">途中出場</button>
+          <button class="appear-btn ${isSubOff ? 'on-suboff':''}" data-act="subOff" data-no="${p.no}">途中退場</button>
         </div>`;
     }
 
@@ -719,9 +760,11 @@ function renderRoster(){
         deletePlayer(p.no);
       });
     } else {
-      row.addEventListener('click', ()=>{
-        if(pressFired){ pressFired = false; return; }
-        toggleAttendance(p.no);
+      row.querySelectorAll('.appear-btn').forEach(btn=>{
+        btn.addEventListener('click', (e)=>{
+          e.stopPropagation();
+          toggleAppearance(p.no, btn.dataset.act);
+        });
       });
     }
 
@@ -759,8 +802,8 @@ function deletePlayer(no){
         deletedNos.add(no);
       }
       delete assignment[no];
-      selected.A.first.delete(no); selected.A.second.delete(no);
-      selected.B.first.delete(no); selected.B.second.delete(no);
+      appearance.A.starter.delete(no); appearance.A.sub.delete(no); appearance.A.subOff.delete(no);
+      appearance.B.starter.delete(no); appearance.B.sub.delete(no); appearance.B.subOff.delete(no);
       ['A','B'].forEach(team=>{
         goals[team] = goals[team]
           .filter(g=>g.scorer !== no)
@@ -770,7 +813,7 @@ function deletePlayer(no){
       persist();
       persistOverrides();
       renderRoster();
-      updateHalfCounts();
+      updateAppearanceCounts();
       showToast('選手を削除しました');
     }
   );
@@ -1086,20 +1129,25 @@ function renderBulkForm(){
   });
 }
 
-function toggleAttendance(no){
-  const set = selected[currentTeam][currentHalf];
-  const willAdd = !set.has(no);
-  if(willAdd) set.add(no); else set.delete(no);
+function toggleAppearance(no, key){
+  const tags = appearance[currentTeam];
+  const set = tags[key];
+  const turningOn = !set.has(no);
 
-  // 前半での選択は後半にも引き継ぐ（一方向）。後半での変更は前半に影響させない。
-  if(currentHalf === 'first'){
-    const secondSet = selected[currentTeam].second;
-    if(willAdd) secondSet.add(no); else secondSet.delete(no);
+  if(turningOn && key === 'starter' && tags.starter.size >= 11){
+    showToast('スタメンは11人まで選べます');
+    return;
   }
+
+  if(turningOn) set.add(no); else set.delete(no);
+
+  // スタメンと途中出場は同時に選べない（一方をONにするともう一方は自動でOFF）。
+  if(turningOn && key === 'starter') tags.sub.delete(no);
+  if(turningOn && key === 'sub') tags.starter.delete(no);
 
   persist();
   renderRoster();
-  updateHalfCounts();
+  updateAppearanceCounts();
 }
 
 function toggleAssignment(no, team){
@@ -1108,14 +1156,15 @@ function toggleAssignment(no, team){
   } else {
     const prev = assignment[no];
     if(prev){
-      selected[prev].first.delete(no);
-      selected[prev].second.delete(no);
+      appearance[prev].starter.delete(no);
+      appearance[prev].sub.delete(no);
+      appearance[prev].subOff.delete(no);
     }
     assignment[no] = team;
   }
   persist();
   renderRoster();
-  updateHalfCounts();
+  updateAppearanceCounts();
 }
 
 function updateAssignCounts(){
@@ -1128,9 +1177,10 @@ function updateAssignCounts(){
   document.getElementById('countUn').textContent = total - a - b;
 }
 
-function updateHalfCounts(){
-  document.getElementById('countFirst').textContent = `出場 ${selected[currentTeam].first.size}名`;
-  document.getElementById('countSecond').textContent = `出場 ${selected[currentTeam].second.size}名`;
+function updateAppearanceCounts(){
+  document.getElementById('countStarter').textContent = `${appearance[currentTeam].starter.size}名`;
+  document.getElementById('countSub').textContent = `${appearance[currentTeam].sub.size}名`;
+  document.getElementById('countSubOff').textContent = `${appearance[currentTeam].subOff.size}名`;
 }
 
 function switchMode(m){
@@ -1148,7 +1198,7 @@ function switchMode(m){
   document.getElementById('scorePanel').style.display = showResult ? 'block' : 'none';
   document.getElementById('commentPanel').style.display = showResult ? 'flex' : 'none';
   document.getElementById('goalsPanel').style.display = showResult ? 'block' : 'none';
-  document.getElementById('halfTabs').style.display = showResult ? 'flex' : 'none';
+  document.getElementById('appearanceSummary').style.display = showResult ? 'flex' : 'none';
   document.getElementById('footer').style.display = 'block';
   document.getElementById('assignToolbar').style.display = showResult ? 'none' : 'flex';
   document.getElementById('addPlayerBtnWrap').style.display = showResult ? 'none' : 'flex';
@@ -1169,7 +1219,7 @@ function switchMode(m){
 
   if(showResult) renderGoals();
   renderRoster();
-  updateHalfCounts();
+  updateAppearanceCounts();
 }
 
 function switchTeam(team){
@@ -1190,56 +1240,47 @@ function switchTeam(team){
 
   renderGoals();
   renderRoster();
-  updateHalfCounts();
-}
-
-function switchHalf(half){
-  currentHalf = half;
-  document.getElementById('tabFirst').classList.toggle('active', half==='first');
-  document.getElementById('tabSecond').classList.toggle('active', half==='second');
-  renderRoster();
+  updateAppearanceCounts();
 }
 
 document.getElementById('modeAssign').addEventListener('click', ()=>switchMode('assign'));
 document.getElementById('modeResult').addEventListener('click', ()=>switchMode('result'));
 document.getElementById('teamAChip').addEventListener('click', ()=>switchTeam('A'));
 document.getElementById('teamBChip').addEventListener('click', ()=>switchTeam('B'));
-document.getElementById('tabFirst').addEventListener('click', ()=>switchHalf('first'));
-document.getElementById('tabSecond').addEventListener('click', ()=>switchHalf('second'));
-
 searchEl.addEventListener('input', renderRoster);
 
-document.getElementById('checkAll').addEventListener('click', ()=>{
-  const q = searchEl.value.trim().toLowerCase();
-  getAllNos().forEach(no=>{
-    if(assignment[no] !== currentTeam) return;
-    const p = player(no);
-    const hay = (p.name + p.kana + p.no).toLowerCase();
-    if(!q || hay.includes(q)){
-      selected[currentTeam][currentHalf].add(no);
-      if(currentHalf === 'first') selected[currentTeam].second.add(no);
-    }
-  });
-  persist(); renderRoster(); updateHalfCounts();
+document.getElementById('sortByNo').addEventListener('click', ()=>{
+  sortMode = 'no';
+  document.getElementById('sortByNo').classList.add('active');
+  document.getElementById('sortByPos').classList.remove('active');
+  renderRoster();
 });
-document.getElementById('uncheckAll').addEventListener('click', ()=>{
+document.getElementById('sortByPos').addEventListener('click', ()=>{
+  sortMode = 'pos';
+  document.getElementById('sortByPos').classList.add('active');
+  document.getElementById('sortByNo').classList.remove('active');
+  renderRoster();
+});
+
+document.getElementById('clearAppearance').addEventListener('click', ()=>{
   const q = searchEl.value.trim().toLowerCase();
   getAllNos().forEach(no=>{
     if(assignment[no] !== currentTeam) return;
     const p = player(no);
     const hay = (p.name + p.kana + p.no).toLowerCase();
     if(!q || hay.includes(q)){
-      selected[currentTeam][currentHalf].delete(no);
-      if(currentHalf === 'first') selected[currentTeam].second.delete(no);
+      appearance[currentTeam].starter.delete(no);
+      appearance[currentTeam].sub.delete(no);
+      appearance[currentTeam].subOff.delete(no);
     }
   });
-  persist(); renderRoster(); updateHalfCounts();
+  persist(); renderRoster(); updateAppearanceCounts();
 });
 document.getElementById('resetAssign').addEventListener('click', ()=>{
   assignment = {};
-  selected.A.first.clear(); selected.A.second.clear();
-  selected.B.first.clear(); selected.B.second.clear();
-  persist(); renderRoster(); updateHalfCounts();
+  appearance.A.starter.clear(); appearance.A.sub.clear(); appearance.A.subOff.clear();
+  appearance.B.starter.clear(); appearance.B.sub.clear(); appearance.B.subOff.clear();
+  persist(); renderRoster(); updateAppearanceCounts();
 });
 
 document.getElementById('scoreOwn').addEventListener('input', (e)=>{
@@ -1389,14 +1430,20 @@ function buildMessage(){
     const d = new Date(dateRaw + 'T00:00:00');
     dateStr = `${d.getMonth()+1}/${d.getDate()}`;
   }
-  const firstList = getAllNos().filter(no=>assignment[no]===currentTeam && selected[currentTeam].first.has(no)).map(player).sort((a,b)=>a.no-b.no);
-  const secondList = getAllNos().filter(no=>assignment[no]===currentTeam && selected[currentTeam].second.has(no)).map(player).sort((a,b)=>a.no-b.no);
+  const tags = appearance[currentTeam];
+  const starters = getAllNos().filter(no=>assignment[no]===currentTeam && tags.starter.has(no)).map(player).sort((a,b)=>a.no-b.no);
+  const subs = getAllNos().filter(no=>assignment[no]===currentTeam && tags.sub.has(no)).map(player).sort((a,b)=>a.no-b.no);
   const teamGoals = goals[currentTeam];
   const own = scores[currentTeam].own;
   const opp = scores[currentTeam].opp;
   const good = comments[currentTeam].good.trim();
   const issue = comments[currentTeam].issue.trim();
   const other = comments[currentTeam].other.trim();
+
+  function appearanceLine(p){
+    const off = tags.subOff.has(p.no) ? '（途中交代）' : '';
+    return `${String(p.no).padStart(2,' ')} ${p.name}（${p.pos}）${off}`;
+  }
 
   let msg = `【${teamLabel(currentTeam)}】${opponent}戦${dateStr ? ' ' + dateStr : ''}\n`;
   msg += `━━━━━━━━━━\n`;
@@ -1424,15 +1471,11 @@ function buildMessage(){
     msg += `コメント\n${other}\n`;
   }
   msg += `━━━━━━━━━━\n`;
-  msg += `前半 出場（${firstList.length}名）\n`;
-  msg += firstList.length ? firstList.map(p=>`${String(p.no).padStart(2,' ')} ${p.name}（${p.pos}）`).join('\n') : '（未選択）';
+  msg += `スタメン（${starters.length}名）\n`;
+  msg += starters.length ? starters.map(appearanceLine).join('\n') : '（未選択）';
   msg += `\n━━━━━━━━━━\n`;
-  msg += `後半 出場（${secondList.length}名）\n`;
-  const firstNos = new Set(firstList.map(p=>p.no));
-  msg += secondList.length ? secondList.map(p=>{
-    const sub = !firstNos.has(p.no) ? '（後）' : '';
-    return `${String(p.no).padStart(2,' ')} ${p.name}（${p.pos}）${sub}`;
-  }).join('\n') : '（未選択）';
+  msg += `途中出場（${subs.length}名）\n`;
+  msg += subs.length ? subs.map(appearanceLine).join('\n') : '（なし）';
   return msg;
 }
 
@@ -1636,12 +1679,12 @@ async function storageGet(key){
 }
 
 async function persist(){
-  await storageSet('lineup-draft-v5', JSON.stringify({
+  await storageSet('lineup-draft-v6', JSON.stringify({
     opponent: document.getElementById('opponent').value,
     date: document.getElementById('matchDate').value,
     assignment: assignment,
-    A: { first: Array.from(selected.A.first), second: Array.from(selected.A.second) },
-    B: { first: Array.from(selected.B.first), second: Array.from(selected.B.second) },
+    A: { starter: Array.from(appearance.A.starter), sub: Array.from(appearance.A.sub), subOff: Array.from(appearance.A.subOff) },
+    B: { starter: Array.from(appearance.B.starter), sub: Array.from(appearance.B.sub), subOff: Array.from(appearance.B.subOff) },
     scores: scores,
     comments: comments,
     goals: goals,
@@ -1661,12 +1704,12 @@ async function persistTeamName(){
 }
 
 async function loadPersisted(){
-  let raw = await storageGet('lineup-draft-v5');
-  if(!raw) raw = await storageGet('lineup-draft-v4'); // migrate from earlier version
+  let raw = await storageGet('lineup-draft-v6');
+  if(!raw) raw = await storageGet('lineup-draft-v5'); // migrate from earlier version
   if(raw){
     try{
       const data = JSON.parse(raw);
-      // 対戦相手・試合結果(得点)・得点者/アシスト・出場選手チェック・コメントは
+      // 対戦相手・試合結果(得点)・得点者/アシスト・出場記録・コメントは
       // 毎回リセットする仕様のため、ここでは意図的に復元しない。
       // 選手登録（A/B振り分け・名簿）のみ復元する。
       assignment = data.assignment || {};
@@ -1677,9 +1720,9 @@ async function loadPersisted(){
   scores = { A:{own:'',opp:''}, B:{own:'',opp:''} };
   goals = { A: [], B: [] };
   comments = { A:{good:'',issue:'',other:''}, B:{good:'',issue:'',other:''} };
-  selected = {
-    A: { first: new Set(), second: new Set() },
-    B: { first: new Set(), second: new Set() },
+  appearance = {
+    A: { starter: new Set(), sub: new Set(), subOff: new Set() },
+    B: { starter: new Set(), sub: new Set(), subOff: new Set() },
   };
 
   let regRaw = await storageGet('player-registry-v1');
