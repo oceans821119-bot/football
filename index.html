@@ -82,7 +82,14 @@
   .team-name-input:focus{border-bottom-color:var(--green-bright);}
   .match-row{display:flex;gap:8px;}
   .field{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0;}
-  .field label{font-size:11px;color:#9fb3c8;font-weight:600;}
+  .field label{font-size:11.5px;color:#9fb3c8;font-weight:700;}
+  .match-info-card{
+    margin:14px 20px 0;
+    padding:14px 16px;
+    background:var(--navy);
+    border-radius:10px;
+    box-shadow:0 2px 8px rgba(19,32,56,0.15);
+  }
   .field input{
     background:var(--paper);
     border:1px solid var(--line);
@@ -135,6 +142,28 @@
   }
   .team-chip.teamA.active{background:var(--teamA);border-color:var(--teamA);color:#fff;}
   .team-chip.teamB.active{background:var(--teamB);border-color:var(--teamB);color:#fff;}
+  .training-row{
+    display:flex;align-items:stretch;gap:8px;
+    margin:10px 20px 0;
+  }
+  .training-toggle-label{
+    display:flex;align-items:center;gap:9px;
+    padding:9px 14px;flex:none;
+    background:var(--paper-card);border:1px solid var(--line);border-radius:9px;
+    cursor:pointer;
+  }
+  .training-toggle-label input{width:26px;height:26px;flex:none;accent-color:var(--green);}
+  .training-label-text{font-size:16px;font-weight:800;color:var(--ink);letter-spacing:.02em;}
+  .training-bout-field{
+    display:flex;align-items:center;gap:8px;flex:1;
+    padding:6px 14px;
+    background:var(--paper-card);border:1px solid var(--line);border-radius:9px;
+  }
+  .training-bout-field label{font-size:13.5px;font-weight:700;color:var(--ink-soft);white-space:nowrap;}
+  .training-bout-field input{
+    width:52px;flex:none;padding:7px 8px;border-radius:7px;border:1px solid var(--line);
+    font-family:inherit;font-size:16px;background:#fff;box-sizing:border-box;text-align:center;
+  }
 
   .score-panel{
     margin:14px 20px 0;background:var(--navy);border-radius:12px;padding:14px 16px;color:#f4f0e6;
@@ -150,6 +179,14 @@
   .score-team-label{font-size:11px;color:#9fb3c8;text-align:center;margin-top:4px;}
   .score-cols{display:flex;gap:12px;align-items:flex-start;justify-content:center;}
   .score-cols>div{flex:none;}
+  .pk-toggle-label{
+    display:flex;align-items:center;gap:7px;justify-content:center;
+    margin-top:12px;padding-top:12px;border-top:1px dashed rgba(255,255,255,0.2);
+    font-size:12.5px;color:#cdd8e6;font-weight:600;cursor:pointer;
+  }
+  .pk-toggle-label input{width:26px;height:26px;accent-color:var(--green-bright);}
+  .pk-cols{margin-top:10px;}
+  .pk-inputs input{font-size:20px;width:48px;}
 
   /* comments */
   .comment-panel{margin:14px 20px 140px;display:flex;flex-direction:column;gap:10px;}
@@ -428,9 +465,12 @@
       <input id="teamNameInput" class="team-name-input" type="text" placeholder="例）鳥取城北高校" maxlength="40">
       <br>試合結果
     </h1>
+  </header>
+
+  <div class="match-info-card">
     <div class="match-row">
       <div class="field opponent">
-        <label for="opponent">対戦相手 <span style="color:#e08a6b;">必須</span></label>
+        <label for="opponent">対戦相手 <span style="color:var(--red);">必須</span></label>
         <input id="opponent" type="text" placeholder="例）鳥取商業高校">
       </div>
       <div class="field" style="max-width:130px; margin-right:18px;">
@@ -438,7 +478,7 @@
         <input id="matchDate" type="date">
       </div>
     </div>
-  </header>
+  </div>
 
   <div class="mode-tabs">
     <button class="mode-tab active" id="modeResult" data-mode="result">出場結果</button>
@@ -452,6 +492,17 @@
     <button class="team-chip teamB" id="teamBChip">Group B</button>
   </div>
 
+  <div class="training-row" id="trainingRow" style="display:none;">
+    <label class="training-toggle-label">
+      <input type="checkbox" id="trainingModeToggle">
+      <span class="training-label-text">Training</span>
+    </label>
+    <div class="training-bout-field" id="trainingBoutWrap" style="display:none;">
+      <input type="number" min="1" max="99" id="trainingBout" inputmode="numeric">
+      <label for="trainingBout">本目</label>
+    </div>
+  </div>
+
   <div class="score-panel" id="scorePanel" style="display:none;">
     <div class="vs-label">試合結果</div>
     <div class="score-cols">
@@ -463,6 +514,21 @@
       <div>
         <div class="score-inputs"><input type="number" min="0" id="scoreOpp" inputmode="numeric"></div>
         <div class="score-team-label">相手</div>
+      </div>
+    </div>
+    <label class="pk-toggle-label">
+      <input type="checkbox" id="pkEnabled">
+      PK戦
+    </label>
+    <div class="score-cols pk-cols" id="pkInputs" style="display:none;">
+      <div>
+        <div class="score-inputs pk-inputs"><input type="number" min="0" id="pkOwn" inputmode="numeric"></div>
+        <div class="score-team-label">自チームPK</div>
+      </div>
+      <div class="score-dash">-</div>
+      <div>
+        <div class="score-inputs pk-inputs"><input type="number" min="0" id="pkOpp" inputmode="numeric"></div>
+        <div class="score-team-label">相手PK</div>
       </div>
     </div>
   </div>
@@ -496,8 +562,8 @@
   </div>
 
   <div class="sort-toggle">
-    <button class="sort-btn" id="sortByNo">背番号順</button>
     <button class="sort-btn active" id="sortByPos">ポジション順</button>
+    <button class="sort-btn" id="sortByNo">背番号順</button>
   </div>
 
   <div style="margin:10px 20px 0;display:flex;gap:8px;" id="addPlayerBtnWrap">
@@ -532,11 +598,11 @@
 
   <div class="comment-panel" id="commentPanel" style="display:none;">
     <div class="comment-block good">
-      <label>良かった点 <span class="req">必須</span></label>
+      <label>良かった点 <span class="req" id="goodReqLabel">必須</span></label>
       <textarea id="commentGood" placeholder="例）前線からのプレスが機能し、ボール奪取から得点につながった"></textarea>
     </div>
     <div class="comment-block issue">
-      <label>課題点 <span class="req">必須</span></label>
+      <label>課題点 <span class="req" id="issueReqLabel">必須</span></label>
       <textarea id="commentIssue" placeholder="例）セットプレーの守備対応に課題が残った"></textarea>
     </div>
     <div class="comment-block other">
@@ -624,6 +690,23 @@ function positionSortIndex(pos){
   return 9999;
 }
 
+// トレーニングマッチモード：前半/後半ではなく1本目/2本目/3本目で記録する。
+const PERIOD_KEYS_NORMAL = ['first','second'];
+const PERIOD_KEYS_TRAINING = ['first','second','third'];
+const PERIOD_LABELS_NORMAL = { first:'前半', second:'後半' };
+const PERIOD_LABELS_TRAINING = { first:'1本目', second:'2本目', third:'3本目' };
+
+function periodKeys(){
+  return trainingMode ? PERIOD_KEYS_TRAINING : PERIOD_KEYS_NORMAL;
+}
+function halfLabel(key){
+  if(trainingMode){
+    if(/^\d+$/.test(String(key))) return `${key}本目`;
+    return PERIOD_LABELS_TRAINING[key] || `${key}本目`;
+  }
+  return PERIOD_LABELS_NORMAL[key] || key;
+}
+
 function positionOptions(selected){
   return POSITION_GROUPS.map(g=>
     `<optgroup label="${g.label}">${g.options.map(o=>
@@ -644,6 +727,8 @@ let goalFormOpen = false;
 let addPlayerFormOpen = false;
 let bulkFormOpen = false;
 let pendingHalf = 'first'; // ゴール登録（得点のタイミング）用。出場記録とは別の概念。
+let trainingBout = ''; // トレーニングマッチの「◯本目」（試合単位、得点ごとではない）
+let trainingMode = false; // true: Training表記, false: 通常（前半/後半）
 
 let assignment = {};
 let appearance = {
@@ -651,6 +736,7 @@ let appearance = {
   B: { starter: new Set(), sub: new Set(), subOff: new Set() },
 };
 let scores = { A: { own: '', opp: '' }, B: { own: '', opp: '' } };
+let pk = { A: { enabled: false, own: '', opp: '' }, B: { enabled: false, own: '', opp: '' } };
 let comments = { A: { good: '', issue: '', other: '' }, B: { good: '', issue: '', other: '' } };
 let goals = { A: [], B: [] };
 
@@ -1195,6 +1281,7 @@ function switchMode(m){
 
   const showResult = m==='result';
   document.getElementById('teamSwitch').style.display = showResult ? 'flex' : 'none';
+  document.getElementById('trainingRow').style.display = showResult ? 'flex' : 'none';
   document.getElementById('scorePanel').style.display = showResult ? 'block' : 'none';
   document.getElementById('commentPanel').style.display = showResult ? 'flex' : 'none';
   document.getElementById('goalsPanel').style.display = showResult ? 'block' : 'none';
@@ -1234,6 +1321,10 @@ function switchTeam(team){
 
   document.getElementById('scoreOwn').value = scores[team].own;
   document.getElementById('scoreOpp').value = scores[team].opp;
+  document.getElementById('pkEnabled').checked = pk[team].enabled;
+  document.getElementById('pkInputs').style.display = pk[team].enabled ? 'flex' : 'none';
+  document.getElementById('pkOwn').value = pk[team].own;
+  document.getElementById('pkOpp').value = pk[team].opp;
   document.getElementById('commentGood').value = comments[team].good;
   document.getElementById('commentIssue').value = comments[team].issue;
   document.getElementById('commentOther').value = comments[team].other;
@@ -1289,6 +1380,30 @@ document.getElementById('scoreOwn').addEventListener('input', (e)=>{
 document.getElementById('scoreOpp').addEventListener('input', (e)=>{
   scores[currentTeam].opp = e.target.value; persist();
 });
+document.getElementById('pkEnabled').addEventListener('change', (e)=>{
+  pk[currentTeam].enabled = e.target.checked;
+  document.getElementById('pkInputs').style.display = e.target.checked ? 'flex' : 'none';
+  persist();
+});
+document.getElementById('pkOwn').addEventListener('input', (e)=>{
+  pk[currentTeam].own = e.target.value; persist();
+});
+document.getElementById('pkOpp').addEventListener('input', (e)=>{
+  pk[currentTeam].opp = e.target.value; persist();
+});
+document.getElementById('trainingModeToggle').addEventListener('change', (e)=>{
+  trainingMode = e.target.checked;
+  if(!trainingMode && pendingHalf === 'third') pendingHalf = 'first';
+  document.getElementById('trainingBoutWrap').style.display = trainingMode ? 'flex' : 'none';
+  persistTrainingMode();
+  updateCommentRequiredLabels();
+  renderGoalForm();
+  renderGoals();
+});
+document.getElementById('trainingBout').addEventListener('input', (e)=>{
+  trainingBout = e.target.value;
+  persist();
+});
 document.getElementById('commentGood').addEventListener('input', (e)=>{
   comments[currentTeam].good = e.target.value; persist();
 });
@@ -1319,6 +1434,14 @@ document.getElementById('addGoalBtn').addEventListener('click', ()=>{
 function renderGoalForm(){
   const el = document.getElementById('goalForm');
   if(!goalFormOpen){ el.innerHTML=''; return; }
+  const timingField = trainingMode
+    ? '' // トレーニングマッチでは得点ごとのタイミング入力は不要（◯本目は試合単位で入力）
+    : `<div>
+        <label>タイミング</label>
+        <div class="half-pick">
+          ${periodKeys().map(k=>`<button type="button" data-period="${k}" class="${pendingHalf===k?'active':''}">${halfLabel(k)}</button>`).join('')}
+        </div>
+      </div>`;
   el.innerHTML = `
     <div class="goal-form">
       <div class="row">
@@ -1336,21 +1459,18 @@ function renderGoalForm(){
           </select>
         </div>
       </div>
-      <div>
-        <label>タイミング</label>
-        <div class="half-pick">
-          <button type="button" id="pickFirst" class="${pendingHalf==='first'?'active':''}">前半</button>
-          <button type="button" id="pickSecond" class="${pendingHalf==='second'?'active':''}">後半</button>
-        </div>
-      </div>
+      ${timingField}
       <div class="form-actions">
         <button type="button" class="cancel" id="cancelGoal">キャンセル</button>
         <button type="button" class="confirm" id="confirmGoal">追加する</button>
       </div>
     </div>
   `;
-  document.getElementById('pickFirst').addEventListener('click', ()=>{ pendingHalf='first'; renderGoalForm(); });
-  document.getElementById('pickSecond').addEventListener('click', ()=>{ pendingHalf='second'; renderGoalForm(); });
+  if(!trainingMode){
+    el.querySelectorAll('.half-pick button').forEach(btn=>{
+      btn.addEventListener('click', ()=>{ pendingHalf = btn.dataset.period; renderGoalForm(); });
+    });
+  }
   document.getElementById('cancelGoal').addEventListener('click', ()=>{ goalFormOpen=false; renderGoalForm(); });
   document.getElementById('confirmGoal').addEventListener('click', ()=>{
     const scorer = document.getElementById('goalScorer').value;
@@ -1359,7 +1479,7 @@ function renderGoalForm(){
     goals[currentTeam].push({
       scorer: Number(scorer),
       assist: assist ? Number(assist) : null,
-      half: pendingHalf,
+      half: trainingMode ? null : pendingHalf,
     });
     goalFormOpen = false;
     pendingHalf = 'first';
@@ -1379,10 +1499,10 @@ function renderGoals(){
   el.innerHTML = list.map((g,i)=>{
     const scorer = player(g.scorer);
     const assist = g.assist ? player(g.assist) : null;
-    const halfLabel = g.half === 'first' ? '前半' : '後半';
+    const periodText = g.half ? halfLabel(g.half) : '';
     return `
       <div class="goal-item">
-        <span class="half-tag">${halfLabel}</span>
+        ${periodText ? `<span class="half-tag">${periodText}</span>` : ''}
         <span class="goal-text">
           <b>${scorer.no} ${scorer.name}</b> が得点
           ${assist ? `<div class="assist-text">アシスト：${assist.no} ${assist.name}</div>` : ''}
@@ -1412,6 +1532,7 @@ function validateOpponent(){
 }
 
 function validateComments(){
+  if(trainingMode) return true; // トレーニングマッチでは任意
   const good = comments[currentTeam].good.trim();
   const issue = comments[currentTeam].issue.trim();
   if(!good || !issue){
@@ -1420,6 +1541,12 @@ function validateComments(){
     return false;
   }
   return true;
+}
+
+function updateCommentRequiredLabels(){
+  const display = trainingMode ? 'none' : 'inline';
+  document.getElementById('goodReqLabel').style.display = display;
+  document.getElementById('issueReqLabel').style.display = display;
 }
 
 function buildMessage(){
@@ -1446,16 +1573,23 @@ function buildMessage(){
   }
 
   let msg = `【${teamLabel(currentTeam)}】${opponent}戦${dateStr ? ' ' + dateStr : ''}\n`;
+  if(trainingMode && trainingBout.trim() !== ''){
+    msg += `Training  :  ${trainingBout.trim()}本目\n`;
+  }
   msg += `━━━━━━━━━━\n`;
   msg += `結果　${own === '' ? '-' : own} - ${opp === '' ? '-' : opp}\n`;
+  const teamPk = pk[currentTeam];
+  if(teamPk.enabled && (teamPk.own !== '' || teamPk.opp !== '')){
+    msg += `PK　${teamPk.own === '' ? '-' : teamPk.own} - ${teamPk.opp === '' ? '-' : teamPk.opp}\n`;
+  }
   msg += `━━━━━━━━━━\n`;
   msg += `得点・アシスト\n`;
   if(teamGoals.length){
     msg += teamGoals.map(g=>{
       const scorer = player(g.scorer);
       const assist = g.assist ? player(g.assist) : null;
-      const halfLabel = g.half === 'first' ? '前半' : '後半';
-      let line = `${halfLabel} ${scorer.no} ${scorer.name}`;
+      const periodText = g.half ? halfLabel(g.half) : '';
+      let line = periodText ? `${periodText} ${scorer.no} ${scorer.name}` : `${scorer.no} ${scorer.name}`;
       if(assist) line += `（アシスト：${assist.no} ${assist.name}）`;
       return line;
     }).join('\n');
@@ -1463,14 +1597,14 @@ function buildMessage(){
     msg += '（登録なし）';
   }
   msg += `\n━━━━━━━━━━\n`;
-  msg += `良かった点\n${good}\n`;
-  msg += `━━━━━━━━━━\n`;
-  msg += `課題点\n${issue}\n`;
-  if(other){
+  const commentBlocks = [];
+  if(!trainingMode || good) commentBlocks.push(`良かった点\n${good}`);
+  if(!trainingMode || issue) commentBlocks.push(`課題点\n${issue}`);
+  if(other) commentBlocks.push(`コメント\n${other}`);
+  if(commentBlocks.length){
+    msg += commentBlocks.join(`\n━━━━━━━━━━\n`) + `\n`;
     msg += `━━━━━━━━━━\n`;
-    msg += `コメント\n${other}\n`;
   }
-  msg += `━━━━━━━━━━\n`;
   msg += `スタメン（${starters.length}名）\n`;
   msg += starters.length ? starters.map(appearanceLine).join('\n') : '（未選択）';
   msg += `\n━━━━━━━━━━\n`;
@@ -1686,8 +1820,10 @@ async function persist(){
     A: { starter: Array.from(appearance.A.starter), sub: Array.from(appearance.A.sub), subOff: Array.from(appearance.A.subOff) },
     B: { starter: Array.from(appearance.B.starter), sub: Array.from(appearance.B.sub), subOff: Array.from(appearance.B.subOff) },
     scores: scores,
+    pk: pk,
     comments: comments,
     goals: goals,
+    trainingBout: trainingBout,
   }));
 }
 
@@ -1701,6 +1837,10 @@ async function persistOverrides(){
 
 async function persistTeamName(){
   await storageSet('team-name', teamName);
+}
+
+async function persistTrainingMode(){
+  await storageSet('training-mode', trainingMode ? '1' : '0');
 }
 
 async function loadPersisted(){
@@ -1718,6 +1858,8 @@ async function loadPersisted(){
   // Always start fresh for these, regardless of what was saved previously.
   document.getElementById('opponent').value = '';
   scores = { A:{own:'',opp:''}, B:{own:'',opp:''} };
+  pk = { A:{enabled:false,own:'',opp:''}, B:{enabled:false,own:'',opp:''} };
+  trainingBout = '';
   goals = { A: [], B: [] };
   comments = { A:{good:'',issue:'',other:''}, B:{good:'',issue:'',other:''} };
   appearance = {
@@ -1743,6 +1885,9 @@ async function loadPersisted(){
   // チーム名はアプリを閉じても保持する（対戦相手などとは違いリセットしない）。
   const savedTeamName = await storageGet('team-name');
   if(savedTeamName) teamName = savedTeamName;
+
+  // Trainingモードは毎回デフォルトで解除（前回の状態は引き継がない）。
+  trainingMode = false;
 }
 
 document.getElementById('opponent').addEventListener('input', persist);
@@ -1757,8 +1902,16 @@ document.getElementById('teamNameInput').addEventListener('input', (e)=>{
   document.getElementById('matchDate').value = today.toISOString().slice(0,10);
   await loadPersisted();
   document.getElementById('teamNameInput').value = teamName;
+  document.getElementById('trainingModeToggle').checked = trainingMode;
+  document.getElementById('trainingBoutWrap').style.display = trainingMode ? 'flex' : 'none';
+  document.getElementById('trainingBout').value = trainingBout;
+  updateCommentRequiredLabels();
   document.getElementById('scoreOwn').value = scores.A.own;
   document.getElementById('scoreOpp').value = scores.A.opp;
+  document.getElementById('pkEnabled').checked = pk.A.enabled;
+  document.getElementById('pkInputs').style.display = pk.A.enabled ? 'flex' : 'none';
+  document.getElementById('pkOwn').value = pk.A.own;
+  document.getElementById('pkOpp').value = pk.A.opp;
   document.getElementById('commentGood').value = comments.A.good;
   document.getElementById('commentIssue').value = comments.A.issue;
   document.getElementById('commentOther').value = comments.A.other;
