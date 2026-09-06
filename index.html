@@ -218,6 +218,8 @@
     box-shadow:0 4px 10px rgba(47,110,79,0.25);
   }
   .add-goal-btn:active{background:var(--green-bright);}
+  .card-add-btn{background:#a8792f;box-shadow:0 4px 10px rgba(168,121,47,0.3);}
+  .card-add-btn:active{background:#c0902f;}
   .goal-item{
     display:flex;align-items:center;gap:8px;
     background:var(--paper-card);border:1px solid var(--line);border-radius:9px;
@@ -227,6 +229,9 @@
     flex:none;font-size:10.5px;font-weight:700;color:#fff;
     background:var(--gold);padding:2px 7px;border-radius:999px;
   }
+  .goal-item .half-tag.half-first{background:var(--posDF);}
+  .goal-item .half-tag.half-second{background:var(--posFW);}
+  .goal-item .half-tag.half-third{background:var(--teamB);}
   .goal-item .goal-text{flex:1;line-height:1.4;}
   .goal-item .goal-text b{font-weight:700;}
   .goal-item .assist-text{color:var(--ink-soft);font-size:12px;}
@@ -252,6 +257,9 @@
     background:#fff;font-family:inherit;font-weight:700;font-size:13px;color:var(--ink-soft);cursor:pointer;
   }
   .goal-form .half-pick button.active{background:var(--navy);border-color:var(--navy);color:#fff;}
+  .goal-form .half-pick button[data-period="first"].active{background:var(--posDF);border-color:var(--posDF);color:#fff;}
+  .goal-form .half-pick button[data-period="second"].active{background:var(--posFW);border-color:var(--posFW);color:#fff;}
+  .goal-form .half-pick button[data-period="third"].active{background:var(--teamB);border-color:var(--teamB);color:#fff;}
   .goal-form .form-actions, .add-player-form .form-actions{display:flex;gap:8px;margin-top:2px;}
   .goal-form .form-actions button, .add-player-form .form-actions button{
     flex:1;padding:9px 0;border-radius:8px;font-weight:700;font-size:13px;
@@ -471,7 +479,7 @@
     <div class="match-row">
       <div class="field opponent">
         <label for="opponent">対戦相手 <span style="color:var(--red);">必須</span></label>
-        <input id="opponent" type="text" placeholder="例）鳥取商業高校">
+        <input id="opponent" type="text" placeholder="例）〇〇FC">
       </div>
       <div class="field" style="max-width:130px; margin-right:18px;">
         <label for="matchDate">日付</label>
@@ -544,6 +552,15 @@
     <div id="goalList"></div>
   </div>
 
+  <div class="goals-panel" id="cardsPanel" style="display:none;">
+    <div class="goals-title">
+      <span>イエロー・レッドカード</span>
+    </div>
+    <button class="add-goal-btn card-add-btn" id="addCardBtn">＋ カードを追加</button>
+    <div id="cardForm"></div>
+    <div id="cardList"></div>
+  </div>
+
   <div class="tabs" id="appearanceSummary" style="display:none;">
     <div class="tab" style="cursor:default;">
       スタメン
@@ -573,7 +590,7 @@
     <button class="bulk-btn" id="bulkBtn" style="flex:1;">一括登録・編集</button>
   </div>
   <div style="margin:8px 20px 0;" id="exportBtnWrap">
-    <button class="bulk-btn" id="exportBtn" style="width:100%;">選手データを出力（Excel/スプレッドシート用）</button>
+    <button class="bulk-btn" id="exportBtn" style="width:100%;">選手データ出力（表計算シート用）</button>
   </div>
   <div id="addPlayerFormWrap" style="margin:0 20px;"></div>
   <div id="bulkFormWrap" style="margin:0 20px;"></div>
@@ -726,6 +743,9 @@ let mode = "assign";
 let currentTeam = "A";
 let sortMode = "pos"; // 'no' | 'pos'
 let goalFormOpen = false;
+let cardFormOpen = false;
+let pendingCardType = 'yellow';
+let pendingCardHalf = 'first';
 let addPlayerFormOpen = false;
 let bulkFormOpen = false;
 let pendingHalf = 'first'; // ゴール登録（得点のタイミング）用。出場記録とは別の概念。
@@ -738,6 +758,7 @@ let appearance = {
   A: { starter: new Set(), sub: new Set(), subOff: new Set() },
   B: { starter: new Set(), sub: new Set(), subOff: new Set() },
 };
+let cards = { A: [], B: [] }; // {player:no, type:'yellow'|'red', half:'first'|'second'|null}
 let scores = { A: { own: '', opp: '' }, B: { own: '', opp: '' } };
 let pk = { A: { enabled: false, own: '', opp: '' }, B: { enabled: false, own: '', opp: '' } };
 let comments = { A: { good: '', issue: '', other: '' }, B: { good: '', issue: '', other: '' } };
@@ -893,6 +914,8 @@ function deletePlayer(no){
       delete assignment[no];
       appearance.A.starter.delete(no); appearance.A.sub.delete(no); appearance.A.subOff.delete(no);
       appearance.B.starter.delete(no); appearance.B.sub.delete(no); appearance.B.subOff.delete(no);
+      cards.A = cards.A.filter(c=>c.player !== no);
+      cards.B = cards.B.filter(c=>c.player !== no);
       ['A','B'].forEach(team=>{
         goals[team] = goals[team]
           .filter(g=>g.scorer !== no)
@@ -1248,6 +1271,7 @@ function toggleAssignment(no, team){
       appearance[prev].starter.delete(no);
       appearance[prev].sub.delete(no);
       appearance[prev].subOff.delete(no);
+      cards[prev] = cards[prev].filter(c=>c.player !== no);
     }
     assignment[no] = team;
   }
@@ -1288,6 +1312,7 @@ function switchMode(m){
   document.getElementById('scorePanel').style.display = showResult ? 'block' : 'none';
   document.getElementById('commentPanel').style.display = showResult ? 'flex' : 'none';
   document.getElementById('goalsPanel').style.display = showResult ? 'block' : 'none';
+  document.getElementById('cardsPanel').style.display = showResult ? 'block' : 'none';
   document.getElementById('appearanceSummary').style.display = showResult ? 'flex' : 'none';
   document.getElementById('footer').style.display = 'block';
   document.getElementById('assignToolbar').style.display = showResult ? 'none' : 'flex';
@@ -1307,7 +1332,7 @@ function switchMode(m){
     document.getElementById('sendLineLabel').textContent = `テキストをコピー＆LINEを開く（${teamLabel(currentTeam)}）`;
   }
 
-  if(showResult) renderGoals();
+  if(showResult){ renderGoals(); renderCards(); }
   renderRoster();
   updateAppearanceCounts();
 }
@@ -1333,6 +1358,7 @@ function switchTeam(team){
   document.getElementById('commentOther').value = comments[team].other;
 
   renderGoals();
+  renderCards();
   renderRoster();
   updateAppearanceCounts();
 }
@@ -1366,15 +1392,17 @@ document.getElementById('clearAppearance').addEventListener('click', ()=>{
       appearance[currentTeam].starter.delete(no);
       appearance[currentTeam].sub.delete(no);
       appearance[currentTeam].subOff.delete(no);
+      cards[currentTeam] = cards[currentTeam].filter(c=>c.player !== no);
     }
   });
-  persist(); renderRoster(); updateAppearanceCounts();
+  persist(); renderRoster(); updateAppearanceCounts(); renderCards();
 });
 document.getElementById('resetAssign').addEventListener('click', ()=>{
   assignment = {};
   appearance.A.starter.clear(); appearance.A.sub.clear(); appearance.A.subOff.clear();
   appearance.B.starter.clear(); appearance.B.sub.clear(); appearance.B.subOff.clear();
-  persist(); renderRoster(); updateAppearanceCounts();
+  cards = { A: [], B: [] };
+  persist(); renderRoster(); updateAppearanceCounts(); renderCards();
 });
 
 document.getElementById('scoreOwn').addEventListener('input', (e)=>{
@@ -1402,6 +1430,8 @@ document.getElementById('trainingModeToggle').addEventListener('change', (e)=>{
   updateCommentRequiredLabels();
   renderGoalForm();
   renderGoals();
+  renderCardForm();
+  renderCards();
 });
 document.getElementById('trainingBout').addEventListener('input', (e)=>{
   trainingBout = e.target.value;
@@ -1509,7 +1539,7 @@ function renderGoals(){
     const periodText = g.half ? halfLabel(g.half) : '';
     return `
       <div class="goal-item">
-        ${periodText ? `<span class="half-tag">${periodText}</span>` : ''}
+        ${periodText ? `<span class="half-tag half-${g.half}">${periodText}</span>` : ''}
         <span class="goal-text">
           <b>${scorer.no} ${scorer.name}</b> が得点
           ${assist ? `<div class="assist-text">アシスト：${assist.no} ${assist.name}</div>` : ''}
@@ -1524,6 +1554,108 @@ function renderGoals(){
       goals[currentTeam].splice(i,1);
       persist();
       renderGoals();
+    });
+  });
+}
+
+document.getElementById('addCardBtn').addEventListener('click', ()=>{
+  if(getAllNos().filter(no=>assignment[no]===currentTeam).length === 0){
+    showToast('先にグループ分けで選手を登録してください');
+    return;
+  }
+  cardFormOpen = true;
+  renderCardForm();
+});
+
+function renderCardForm(){
+  const el = document.getElementById('cardForm');
+  if(!cardFormOpen){ el.innerHTML=''; return; }
+  const timingField = trainingMode
+    ? ''
+    : `<div>
+        <label>タイミング</label>
+        <div class="half-pick">
+          ${periodKeys().map(k=>`<button type="button" data-period="${k}" class="${pendingCardHalf===k?'active':''}">${halfLabel(k)}</button>`).join('')}
+        </div>
+      </div>`;
+  el.innerHTML = `
+    <div class="goal-form">
+      <div class="row">
+        <div style="flex:1;">
+          <label>選手</label>
+          <select id="cardPlayer">${teamRosterOptions()}</select>
+        </div>
+      </div>
+      <div class="row">
+        <div style="flex:1;">
+          <label>カード</label>
+          <div class="half-pick">
+            <button type="button" data-cardtype="yellow" class="${pendingCardType==='yellow'?'active':''}">［黄］</button>
+            <button type="button" data-cardtype="red" class="${pendingCardType==='red'?'active':''}">［赤］</button>
+          </div>
+        </div>
+      </div>
+      ${timingField}
+      <div class="form-actions">
+        <button type="button" class="cancel" id="cancelCard">キャンセル</button>
+        <button type="button" class="confirm" id="confirmCard">追加する</button>
+      </div>
+    </div>
+  `;
+  el.querySelector('[data-cardtype="yellow"]').addEventListener('click', ()=>{ pendingCardType='yellow'; renderCardForm(); });
+  el.querySelector('[data-cardtype="red"]').addEventListener('click', ()=>{ pendingCardType='red'; renderCardForm(); });
+  if(!trainingMode){
+    el.querySelectorAll('.half-pick button[data-period]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{ pendingCardHalf = btn.dataset.period; renderCardForm(); });
+    });
+  }
+  document.getElementById('cancelCard').addEventListener('click', ()=>{ cardFormOpen=false; renderCardForm(); });
+  document.getElementById('confirmCard').addEventListener('click', ()=>{
+    const playerNo = document.getElementById('cardPlayer').value;
+    if(!playerNo) return;
+    cards[currentTeam].push({
+      player: Number(playerNo),
+      type: pendingCardType,
+      half: trainingMode ? null : pendingCardHalf,
+    });
+    cardFormOpen = false;
+    pendingCardType = 'yellow';
+    pendingCardHalf = 'first';
+    persist();
+    renderCardForm();
+    renderCards();
+    renderRoster();
+  });
+}
+
+function renderCards(){
+  const list = cards[currentTeam];
+  const el = document.getElementById('cardList');
+  if(!list || list.length === 0){
+    el.innerHTML = '<div class="goal-empty">まだカードは登録されていません</div>';
+    return;
+  }
+  el.innerHTML = list.map((c,i)=>{
+    const p = player(c.player);
+    const periodText = c.half ? halfLabel(c.half) : '';
+    const icon = c.type === 'red' ? '［赤］' : '［黄］';
+    return `
+      <div class="goal-item">
+        ${periodText ? `<span class="half-tag half-${c.half}">${periodText}</span>` : ''}
+        <span class="goal-text">
+          <b>${p.no} ${p.name}</b> ${icon}
+        </span>
+        <button class="del" data-i="${i}">✕</button>
+      </div>
+    `;
+  }).join('');
+  el.querySelectorAll('.del').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const i = Number(btn.dataset.i);
+      cards[currentTeam].splice(i,1);
+      persist();
+      renderCards();
+      renderRoster();
     });
   });
 }
@@ -1557,7 +1689,7 @@ function updateCommentRequiredLabels(){
 }
 
 function buildMessage(){
-  const opponent = document.getElementById('opponent').value.trim() || '（対戦相手未入力）';
+  const opponent = document.getElementById('opponent').value.trim() || '(対戦相手未入力)';
   const dateRaw = document.getElementById('matchDate').value;
   let dateStr = '';
   if(dateRaw){
@@ -1575,8 +1707,9 @@ function buildMessage(){
   const other = comments[currentTeam].other.trim();
 
   function appearanceLine(p){
-    const off = tags.subOff.has(p.no) ? '（途中交代）' : '';
-    return `${String(p.no).padStart(2,' ')} ${p.name}（${p.pos}）${off}`;
+    const off = tags.subOff.has(p.no) ? '(交代)' : '';
+    const prev = p.prevTeam ? `[${p.prevTeam}]` : '';
+    return `${String(p.no).padStart(2,' ')} ${p.name}(${p.pos})${off} ${prev}`;
   }
 
   let msg = `【${teamLabel(currentTeam)}】${opponent}戦${dateStr ? ' ' + dateStr : ''}\n`;
@@ -1602,11 +1735,22 @@ function buildMessage(){
       const assist = g.assist ? player(g.assist) : null;
       const periodText = g.half ? halfLabel(g.half) : '';
       let line = periodText ? `${periodText} ${scorer.no} ${scorer.name}` : `${scorer.no} ${scorer.name}`;
-      if(assist) line += `（アシスト：${assist.no} ${assist.name}）`;
+      if(assist) line += `(アシスト：${assist.no} ${assist.name})`;
       return line;
     }).join('\n');
   } else {
-    msg += '（登録なし）';
+    msg += '(登録なし)';
+  }
+  const teamCards = cards[currentTeam];
+  if(teamCards.length){
+    msg += `\n━━━━━━━━━━\n`;
+    msg += `カード\n`;
+    msg += teamCards.map(c=>{
+      const p = player(c.player);
+      const periodText = c.half ? halfLabel(c.half) : '';
+      const icon = c.type === 'red' ? '［赤］' : '［黄］';
+      return periodText ? `${periodText} ${p.no} ${p.name} ${icon}` : `${p.no} ${p.name} ${icon}`;
+    }).join('\n');
   }
   msg += `\n━━━━━━━━━━\n`;
   const commentBlocks = [];
@@ -1617,11 +1761,11 @@ function buildMessage(){
     msg += commentBlocks.join(`\n━━━━━━━━━━\n`) + `\n`;
     msg += `━━━━━━━━━━\n`;
   }
-  msg += `スタメン（${starters.length}名）\n`;
-  msg += starters.length ? starters.map(appearanceLine).join('\n') : '（未選択）';
+  msg += `スタメン(${starters.length}名)\n`;
+  msg += starters.length ? starters.map(appearanceLine).join('\n') : '(未選択)';
   msg += `\n━━━━━━━━━━\n`;
-  msg += `途中出場（${subs.length}名）\n`;
-  msg += subs.length ? subs.map(appearanceLine).join('\n') : '（なし）';
+  msg += `途中出場(${subs.length}名)\n`;
+  msg += subs.length ? subs.map(appearanceLine).join('\n') : '(なし)';
   return msg;
 }
 
@@ -1792,7 +1936,7 @@ function renderModal(){
       modalEditing = false;
       renderModal();
       renderRoster();
-      if(mode==='result') renderGoals();
+      if(mode==='result'){ renderGoals(); renderCards(); }
       showToast('選手情報を保存しました');
     });
   }
@@ -1831,6 +1975,7 @@ async function persist(){
     assignment: assignment,
     A: { starter: Array.from(appearance.A.starter), sub: Array.from(appearance.A.sub), subOff: Array.from(appearance.A.subOff) },
     B: { starter: Array.from(appearance.B.starter), sub: Array.from(appearance.B.sub), subOff: Array.from(appearance.B.subOff) },
+    cards: cards,
     scores: scores,
     pk: pk,
     comments: comments,
@@ -1880,6 +2025,7 @@ async function loadPersisted(){
     A: { starter: new Set(), sub: new Set(), subOff: new Set() },
     B: { starter: new Set(), sub: new Set(), subOff: new Set() },
   };
+  cards = { A: [], B: [] };
 
   let regRaw = await storageGet('player-registry-v1');
   if(regRaw){
