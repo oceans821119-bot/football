@@ -155,7 +155,7 @@
   .training-toggle-label input{width:26px;height:26px;flex:none;accent-color:var(--green);}
   .training-label-text{font-size:16px;font-weight:800;color:var(--ink);letter-spacing:.02em;}
   .training-bout-field{
-    display:flex;align-items:center;gap:8px;flex:1;
+    display:flex;align-items:center;gap:8px;flex:1;flex-wrap:wrap;
     padding:6px 14px;
     background:var(--paper-card);border:1px solid var(--line);border-radius:9px;
   }
@@ -500,6 +500,8 @@
     <div class="training-bout-field" id="trainingBoutWrap" style="display:none;">
       <input type="number" min="1" max="99" id="trainingBout" inputmode="numeric">
       <label for="trainingBout">本目</label>
+      <input type="number" min="1" max="999" id="trainingMinutes" inputmode="numeric" style="margin-left:12px;">
+      <label for="trainingMinutes">分</label>
     </div>
   </div>
 
@@ -728,6 +730,7 @@ let addPlayerFormOpen = false;
 let bulkFormOpen = false;
 let pendingHalf = 'first'; // ゴール登録（得点のタイミング）用。出場記録とは別の概念。
 let trainingBout = ''; // トレーニングマッチの「◯本目」（試合単位、得点ごとではない）
+let trainingMinutes = ''; // トレーニングマッチの試合時間（分、試合単位）
 let trainingMode = false; // true: Training表記, false: 通常（前半/後半）
 
 let assignment = {};
@@ -1404,6 +1407,10 @@ document.getElementById('trainingBout').addEventListener('input', (e)=>{
   trainingBout = e.target.value;
   persist();
 });
+document.getElementById('trainingMinutes').addEventListener('input', (e)=>{
+  trainingMinutes = e.target.value;
+  persist();
+});
 document.getElementById('commentGood').addEventListener('input', (e)=>{
   comments[currentTeam].good = e.target.value; persist();
 });
@@ -1573,8 +1580,13 @@ function buildMessage(){
   }
 
   let msg = `【${teamLabel(currentTeam)}】${opponent}戦${dateStr ? ' ' + dateStr : ''}\n`;
-  if(trainingMode && trainingBout.trim() !== ''){
-    msg += `Training  :  ${trainingBout.trim()}本目\n`;
+  if(trainingMode && (trainingBout.trim() !== '' || trainingMinutes.trim() !== '')){
+    let trainingLine = 'Training  :  ';
+    if(trainingBout.trim() !== '') trainingLine += `${trainingBout.trim()}本目`;
+    if(trainingMinutes.trim() !== ''){
+      trainingLine += trainingBout.trim() !== '' ? `　${trainingMinutes.trim()}分` : `${trainingMinutes.trim()}分`;
+    }
+    msg += `${trainingLine}\n`;
   }
   msg += `━━━━━━━━━━\n`;
   msg += `結果　${own === '' ? '-' : own} - ${opp === '' ? '-' : opp}\n`;
@@ -1824,6 +1836,7 @@ async function persist(){
     comments: comments,
     goals: goals,
     trainingBout: trainingBout,
+    trainingMinutes: trainingMinutes,
   }));
 }
 
@@ -1860,6 +1873,7 @@ async function loadPersisted(){
   scores = { A:{own:'',opp:''}, B:{own:'',opp:''} };
   pk = { A:{enabled:false,own:'',opp:''}, B:{enabled:false,own:'',opp:''} };
   trainingBout = '';
+  trainingMinutes = '';
   goals = { A: [], B: [] };
   comments = { A:{good:'',issue:'',other:''}, B:{good:'',issue:'',other:''} };
   appearance = {
@@ -1905,6 +1919,7 @@ document.getElementById('teamNameInput').addEventListener('input', (e)=>{
   document.getElementById('trainingModeToggle').checked = trainingMode;
   document.getElementById('trainingBoutWrap').style.display = trainingMode ? 'flex' : 'none';
   document.getElementById('trainingBout').value = trainingBout;
+  document.getElementById('trainingMinutes').value = trainingMinutes;
   updateCommentRequiredLabels();
   document.getElementById('scoreOwn').value = scores.A.own;
   document.getElementById('scoreOpp').value = scores.A.opp;
